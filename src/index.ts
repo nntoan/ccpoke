@@ -39,7 +39,7 @@ async function loadOrSetupConfig(): Promise<Config> {
   } catch {
     log(t("bot.firstTimeSetup"));
     try {
-      return await runSetup();
+      return await runSetup({ autoStart: true });
     } catch (err: unknown) {
       logError(t("common.setupFailed"), err);
       process.exit(1);

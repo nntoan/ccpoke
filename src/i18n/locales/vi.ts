@@ -57,6 +57,7 @@ export const vi: TranslationKeys = {
     chatIdRegistered: "Đã đăng ký Chat ID",
     complete:
       "🎉 Setup hoàn tất!\n\n  Bước tiếp:\n  1. Chạy bot:  {command}\n  2. Dùng Claude Code bình thường → notification sẽ đến",
+    completeAutoStart: "🎉 Setup hoàn tất! Đang khởi động bot...",
     languageMessage: "Ngôn ngữ",
     tokenUnchanged: "Token không đổi — bỏ qua xác thực",
     selectAgents: "Chọn AI agents (ấn cách để chọn)",
@@ -72,6 +73,10 @@ export const vi: TranslationKeys = {
     tmuxInstallFailed:
       "Không thể cài tmux tự động. Hãy cài thủ công:\n  macOS: brew install tmux\n  Linux: sudo apt install tmux",
     tmuxInstallSkipped: "Bỏ qua cài tmux — chat 2 chiều tắt, notification vẫn hoạt động",
+    addProjectPrompt: "Thêm project để tạo session agent từ Telegram?",
+    addAnotherProject: "Thêm project khác?",
+    projectAdded: 'Đã thêm "{name}" → {path}',
+    skipProject: "Bỏ qua — thêm sau bằng 'ccpoke project'",
   },
 
   uninstall: {

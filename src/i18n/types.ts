@@ -51,6 +51,7 @@ export interface TranslationKeys {
     hookFailed: string;
     chatIdRegistered: string;
     complete: string;
+    completeAutoStart: string;
     languageMessage: string;
     tokenUnchanged: string;
     selectAgents: string;
@@ -65,6 +66,10 @@ export interface TranslationKeys {
     tmuxInstallSuccess: string;
     tmuxInstallFailed: string;
     tmuxInstallSkipped: string;
+    addProjectPrompt: string;
+    addAnotherProject: string;
+    projectAdded: string;
+    skipProject: string;
   };
   uninstall: {
     intro: string;

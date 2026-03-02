@@ -56,6 +56,7 @@ export const zh: TranslationKeys = {
     chatIdRegistered: "聊天 ID 已注册",
     complete:
       "🎉 设置完成！\n\n  下一步:\n  1. 启动机器人:  {command}\n  2. 正常使用 Claude Code → 通知将自动发送",
+    completeAutoStart: "🎉 设置完成！正在启动 bot...",
     languageMessage: "语言",
     tokenUnchanged: "Token 未更改 — 跳过验证",
     selectAgents: "选择 AI 代理 (空格键切换)",
@@ -71,6 +72,10 @@ export const zh: TranslationKeys = {
     tmuxInstallFailed:
       "无法自动安装 tmux。请手动安装:\n  macOS: brew install tmux\n  Linux: sudo apt install tmux",
     tmuxInstallSkipped: "跳过 tmux 安装 — 双向聊天已禁用，通知仍正常工作",
+    addProjectPrompt: "添加项目以从 Telegram 创建 agent 会话？",
+    addAnotherProject: "添加另一个项目？",
+    projectAdded: '已添加 "{name}" → {path}',
+    skipProject: "跳过 — 稍后用 'ccpoke project' 添加",
   },
 
   uninstall: {

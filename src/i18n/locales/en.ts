@@ -57,6 +57,7 @@ export const en: TranslationKeys = {
     chatIdRegistered: "Chat ID registered",
     complete:
       "🎉 Setup complete!\n\n  Next steps:\n  1. Start bot:  {command}\n  2. Use Claude Code normally → notifications will arrive",
+    completeAutoStart: "🎉 Setup complete! Starting bot...",
     languageMessage: "Language",
     tokenUnchanged: "Bot token unchanged — skipping verification",
     selectAgents: "Select AI agents (space to toggle)",
@@ -72,6 +73,10 @@ export const en: TranslationKeys = {
     tmuxInstallFailed:
       "Failed to install tmux automatically. Install it manually:\n  macOS: brew install tmux\n  Linux: sudo apt install tmux",
     tmuxInstallSkipped: "Skipped tmux install — 2-way chat disabled, notifications still work",
+    addProjectPrompt: "Add a project to create agent sessions from Telegram?",
+    addAnotherProject: "Add another project?",
+    projectAdded: 'Added "{name}" → {path}',
+    skipProject: "Skip — add later with 'ccpoke project'",
   },
 
   uninstall: {
