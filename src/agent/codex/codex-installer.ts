@@ -8,7 +8,7 @@ import {
 } from "node:fs";
 import { dirname } from "node:path";
 
-import { ApiRoute } from "../../utils/constants.js";
+import { ApiRoute, isWindows } from "../../utils/constants.js";
 import { getPackageVersion, paths } from "../../utils/paths.js";
 import { AgentName } from "../types.js";
 
@@ -103,6 +103,8 @@ export class CodexInstaller {
       const entries = readNotifyArray(readConfigFile());
       if (!entries.some((e) => e.includes(CCPOKE_MARKER)))
         missing.push("notify entry in config.toml");
+      else if (!entries.includes(paths.codexHookScript))
+        missing.push("wrong notify script path in config.toml");
     } catch {
       missing.push("config.toml");
     }
@@ -119,10 +121,15 @@ export class CodexInstaller {
   private static writeScript(hookPort: number, hookSecret: string): void {
     mkdirSync(paths.hooksDir, { recursive: true });
 
-    if (process.platform === "win32") return;
-
     const version = getPackageVersion();
     const agentParam = `?agent=${AgentName.Codex}`;
+
+    if (isWindows()) {
+      const script = `@REM ccpoke-version: ${version}\n@echo off\necho %~1 | curl -s -X POST http://localhost:${hookPort}${ApiRoute.HookStop}${agentParam} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`;
+      writeFileSync(paths.codexHookScript, script, { mode: 0o644 });
+      return;
+    }
+
     const script = `#!/bin/bash
 # ccpoke-version: ${version}
 JSON="$1"

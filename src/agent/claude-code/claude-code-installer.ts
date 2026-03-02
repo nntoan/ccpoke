@@ -7,7 +7,7 @@ import {
   writeFileSync,
 } from "node:fs";
 
-import { ApiRoute } from "../../utils/constants.js";
+import { ApiRoute, isWindows } from "../../utils/constants.js";
 import { getPackageVersion, paths } from "../../utils/paths.js";
 import { AgentName } from "../types.js";
 
@@ -124,7 +124,7 @@ export class ClaudeCodeInstaller {
       { hooks: [{ type: "command", command: paths.claudeCodeHookScript, timeout: 10 }] },
     ];
 
-    if (process.platform !== "win32") {
+    if (!isWindows()) {
       settings.hooks.SessionStart = [
         ...(settings.hooks.SessionStart ?? []),
         { hooks: [{ type: "command", command: paths.claudeCodeSessionStartScript, timeout: 5 }] },
@@ -175,10 +175,9 @@ export class ClaudeCodeInstaller {
     mkdirSync(paths.hooksDir, { recursive: true });
 
     const agentParam = `?agent=${AgentName.ClaudeCode}`;
-    const isWindows = process.platform === "win32";
     const version = getPackageVersion();
 
-    if (isWindows) {
+    if (isWindows()) {
       const script = `@REM ccpoke-version: ${version}\n@echo off\ncurl -s -X POST http://localhost:${hookPort}${ApiRoute.HookStop}${agentParam} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`;
       writeFileSync(paths.claudeCodeHookScript, script, { mode: 0o644 });
       return;
@@ -208,7 +207,7 @@ echo "$INPUT" | curl -s -X POST "http://localhost:${hookPort}${ApiRoute.HookStop
   private static writeSessionStartScript(hookPort: number, hookSecret: string): void {
     mkdirSync(paths.hooksDir, { recursive: true });
 
-    if (process.platform === "win32") return;
+    if (isWindows()) return;
 
     const version = getPackageVersion();
     const script = `#!/bin/bash
@@ -246,7 +245,7 @@ curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookSessionStart}" \\
   private static writeNotificationScript(hookPort: number, hookSecret: string): void {
     mkdirSync(paths.hooksDir, { recursive: true });
 
-    if (process.platform === "win32") return;
+    if (isWindows()) return;
 
     const version = getPackageVersion();
     const script = `#!/bin/bash
@@ -282,7 +281,7 @@ echo "$PAYLOAD" | curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookNo
   private static writePreToolUseScript(hookPort: number, hookSecret: string): void {
     mkdirSync(paths.hooksDir, { recursive: true });
 
-    if (process.platform === "win32") return;
+    if (isWindows()) return;
 
     const version = getPackageVersion();
     const script = `#!/bin/bash
@@ -320,7 +319,7 @@ echo "$PAYLOAD" | curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookAs
   private static writePermissionRequestScript(hookPort: number, hookSecret: string): void {
     mkdirSync(paths.hooksDir, { recursive: true });
 
-    if (process.platform === "win32") return;
+    if (isWindows()) return;
 
     const version = getPackageVersion();
     const script = `#!/bin/bash
