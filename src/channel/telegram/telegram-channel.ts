@@ -498,7 +498,10 @@ export class TelegramChannel implements NotificationChannel {
       text: AGENT_DISPLAY_NAMES[agent as AgentName] ?? agent,
       callback_data: `agent_start:${idx}:${agent}`,
     }));
-    const rows = [buttons];
+    const rows: TelegramBot.InlineKeyboardButton[][] = [];
+    for (let i = 0; i < buttons.length; i += 3) {
+      rows.push(buttons.slice(i, i + 3));
+    }
 
     await this.bot.sendMessage(
       query.message.chat.id,
@@ -537,8 +540,8 @@ export class TelegramChannel implements NotificationChannel {
       const paneTarget = this.tmuxBridge.createPane(tmuxSession, project.path);
       this.tmuxBridge.sendKeys(paneTarget, startCommand, ["Enter"]);
 
-      if (agentKey === AgentName.Cursor) {
-        this.autoTrustCursorWorkspace(paneTarget);
+      if (agentKey === AgentName.Cursor || agentKey === AgentName.GeminiCli) {
+        this.autoTrustWorkspace(paneTarget, agentKey);
       }
 
       log(`[Projects] started ${agentKey} in ${paneTarget} for ${project.name}`);
@@ -555,7 +558,7 @@ export class TelegramChannel implements NotificationChannel {
     }
   }
 
-  private autoTrustCursorWorkspace(paneTarget: string): void {
+  private autoTrustWorkspace(paneTarget: string, agentKey: string): void {
     let attempts = 0;
     const maxAttempts = 10;
 
@@ -569,7 +572,7 @@ export class TelegramChannel implements NotificationChannel {
         const content = this.tmuxBridge.capturePane(paneTarget, 10);
         if (content.includes("Trust")) {
           this.tmuxBridge.sendSpecialKey(paneTarget, "Enter");
-          logDebug(`[Cursor] auto-trusted workspace at ${paneTarget}`);
+          logDebug(`[${agentKey}] auto-trusted workspace at ${paneTarget}`);
           clearInterval(interval);
         }
       } catch {
@@ -721,6 +724,7 @@ const AGENT_START_COMMANDS: Record<string, string> = {
   [AgentName.ClaudeCode]: "claude --dangerously-skip-permissions",
   [AgentName.Cursor]: "cursor agent --force",
   [AgentName.Codex]: "codex --full-auto",
+  [AgentName.GeminiCli]: "gemini --yolo",
 };
 
 function resolveAgentStartCommand(agent: string): string {

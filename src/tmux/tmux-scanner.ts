@@ -49,6 +49,10 @@ const AGENT_PATTERNS: AgentProcessPattern[] = [
     name: AgentName.Codex,
     processPattern: /\bcodex\b/i,
   },
+  {
+    name: AgentName.GeminiCli,
+    processPattern: /\bgemini\b/i,
+  },
 ];
 
 export function buildProcessTree(): ProcessTree {

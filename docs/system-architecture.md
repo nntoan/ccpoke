@@ -11,13 +11,13 @@ This document describes the overall system architecture, component interactions,
 │                         ccpoke Ecosystem                         │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐            │
-│  │ Claude Code  │  │   Cursor     │  │  Codex CLI   │            │
-│  │   (Agent)    │  │   (Agent)    │  │   (Agent)    │            │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘            │
-│         │                 │                 │                    │
-│         │ Hook Event      │ Hook Event      │ Hook Event         │
-│         └─────────────────┼─────────────────┘                    │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌─────────┐
+│  │ Claude Code  │  │   Cursor     │  │  Codex CLI   │  │ Gemini  │
+│  │   (Agent)    │  │   (Agent)    │  │   (Agent)    │  │  CLI    │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  │(Agent) │
+│         │                 │                 │          └────┬────┘
+│         │ Hook Event      │ Hook Event      │ Hook Event     │
+│         └─────────────────┼─────────────────┼────────────────┘
 │                           │                                      │
 │                    ┌──────▼──────────────────────────┐           │
 │                    │   ccpoke Bridge Server          │           │
@@ -75,10 +75,11 @@ This document describes the overall system architecture, component interactions,
 **Responsibility:** Detect and integrate multiple AI coding agents.
 
 **Components:**
-- **AgentRegistry** — Maintains list of available agents (Claude Code, Cursor, Codex CLI)
+- **AgentRegistry** — Maintains list of available agents (Claude Code, Cursor, Codex CLI, Gemini CLI)
 - **ClaudeCodeProvider** — Claude Code integration
 - **CursorProvider** — Cursor integration
 - **CodexProvider** — Codex CLI integration
+- **GeminiCliProvider** — Gemini CLI integration
 - **AgentHandler** — Central event dispatcher for all hook types
 
 **Key Operations:**
@@ -230,6 +231,7 @@ Detects agents by matching AGENT_PATTERNS:
 - `Claude` for Claude Code
 - `Cursor` for Cursor IDE
 - `codex` for Codex CLI
+- `gemini` for Gemini CLI
 
 ---
 
@@ -529,9 +531,12 @@ index.ts (Entry Point)
   │  │  │  ├─ CursorParser
   │  │  │  ├─ CursorInstaller
   │  │  │  └─ CursorStateReader
-  │  │  └─ CodexProvider
-  │  │     ├─ CodexParser
-  │  │     └─ CodexInstaller
+  │  │  ├─ CodexProvider
+  │  │  │  ├─ CodexParser
+  │  │  │  └─ CodexInstaller
+  │  │  └─ GeminiCliProvider
+  │  │     ├─ GeminiCliParser
+  │  │     └─ GeminiCliInstaller
   │  ├─ SessionResolver
   │  │  └─ SessionMap
   │  └─ TelegramChannel (Observer)
@@ -569,7 +574,7 @@ index.ts (Entry Point)
 │   ├─ user_id
 │   ├─ hook_port (default: 9377)
 │   ├─ hook_secret
-│   ├─ agents: ["claude-code", "cursor", "codex"]
+│   ├─ agents: ["claude-code", "cursor", "codex", "gemini-cli"]
 │   └─ projects: {...}
 │
 ├── state.json            # Chat state

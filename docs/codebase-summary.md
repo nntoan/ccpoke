@@ -69,6 +69,12 @@ Implements the **Provider Pattern** for multi-agent support.
 - **codex-parser.ts** (98 LOC) — Parses Codex notify events + rollout JSONL
 - **codex-provider.ts** (98 LOC) — Implements `AgentProvider` interface (settleDelayMs=500, submitKeys=["Escape","Enter"])
 
+**Gemini CLI Adapter** (`gemini-cli/`)
+- **gemini-cli-installer.ts** — Manages hook configuration for Gemini CLI
+- **gemini-cli-parser.ts** — Parses Gemini CLI transcript files for event extraction
+- **gemini-cli-provider.ts** — Implements `AgentProvider` interface (settleDelayMs=0, submitKeys=["Enter"])
+- **gemini-cli-settings.ts** — Gemini CLI settings and configuration
+
 ### Notification Channels (`src/channel/`)
 
 Implements the **Adapter Pattern** for multi-channel support.
@@ -204,6 +210,7 @@ interface AgentProvider {
 | claude-code | Claude Code | 500 | ["Enter"] |
 | cursor | Cursor CLI | 0 | ["Enter"] |
 | codex | Codex CLI | 500 | ["Escape", "Enter"] |
+| gemini-cli | Gemini CLI | 0 | ["Enter"] |
 
 **Benefits:**
 - Easy to add new agents (implement interface)

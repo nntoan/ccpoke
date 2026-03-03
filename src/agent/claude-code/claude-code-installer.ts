@@ -398,15 +398,10 @@ echo "$PAYLOAD" | curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookPe
     const settings = ClaudeCodeInstaller.readSettings();
     if (!settings.hooks) return;
 
-    for (const hookType of [
-      "Stop",
-      "SessionStart",
-      "Notification",
-      "PreToolUse",
-      "PermissionRequest",
-    ] as const) {
-      const entries = settings.hooks[hookType];
-      if (!entries) continue;
+    const hooks = settings.hooks as Record<string, ClaudeHookEntry[]>;
+    for (const hookType of Object.keys(hooks)) {
+      const entries = hooks[hookType];
+      if (!Array.isArray(entries)) continue;
 
       const filtered = entries.filter(
         (entry) =>
@@ -414,13 +409,13 @@ echo "$PAYLOAD" | curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookPe
       );
 
       if (filtered.length === 0) {
-        delete settings.hooks[hookType];
+        delete hooks[hookType];
       } else {
-        settings.hooks[hookType] = filtered;
+        hooks[hookType] = filtered;
       }
     }
 
-    if (Object.keys(settings.hooks).length === 0) {
+    if (Object.keys(hooks).length === 0) {
       delete settings.hooks;
     }
 

@@ -8,7 +8,7 @@
 
 ### Vision Statement
 
-> **ccpoke** is a zero-config notification bridge for AI coding agents — supporting Claude Code, Cursor, and future agents with ease. When your AI agent completes a task, you get poked on your phone with a summary, git changes, and the ability to chat back.
+**ccpoke** is a zero-config notification bridge for AI coding agents — supporting Claude Code, Cursor, Codex CLI, Gemini CLI, and future agents with ease. When your AI agent completes a task, you get poked on your phone with a summary, git changes, and the ability to chat back.
 
 ### One-Liner
 
@@ -242,6 +242,7 @@ RIGHT:  ccpoke ──(bridges)──→ [existing tmux] ──→ Claude Code
 - Detect Claude Code installation
 - Detect Cursor installation
 - Detect Codex CLI installation
+- Detect Gemini CLI installation
 - Auto-install hooks for detected agents
 - Route events to correct provider
 - Extensible for new agents

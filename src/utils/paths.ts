@@ -12,6 +12,7 @@ const CCPOKE_HOME = join(homedir(), ".ccpoke");
 const CLAUDE_HOME = join(homedir(), ".claude");
 const CURSOR_HOME = join(homedir(), ".cursor");
 const CODEX_HOME = join(homedir(), ".codex");
+const GEMINI_HOME = join(homedir(), ".gemini");
 
 export const paths = {
   projectRoot: PROJECT_ROOT,
@@ -54,6 +55,13 @@ export const paths = {
   codexConfigToml: join(CODEX_HOME, "config.toml"),
   codexSessionsDir: join(CODEX_HOME, "sessions"),
   codexHookScript: join(CCPOKE_HOME, "hooks", isWindows() ? "codex-notify.cmd" : "codex-notify.sh"),
+
+  geminiDir: GEMINI_HOME,
+  geminiSettings: join(GEMINI_HOME, "settings.json"),
+  geminiStopScript: join(CCPOKE_HOME, "hooks", "gemini-stop.sh"),
+  geminiSessionStartScript: join(CCPOKE_HOME, "hooks", "gemini-session-start.sh"),
+  geminiNotificationScript: join(CCPOKE_HOME, "hooks", "gemini-notification.sh"),
+  geminiPreToolUseScript: join(CCPOKE_HOME, "hooks", "gemini-pretooluse.sh"),
 } as const;
 
 export function getPackageVersion(): string {
