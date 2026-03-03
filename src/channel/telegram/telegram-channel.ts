@@ -155,12 +155,12 @@ export class TelegramChannel implements NotificationChannel {
     }
 
     if (data.inputTokens > 0 || data.outputTokens > 0) {
-      let statsLine = `📊 ${escapeMarkdownV2(formatTokenCount(data.inputTokens))} → ${escapeMarkdownV2(formatTokenCount(data.outputTokens))}`;
-      if (data.model) {
-        statsLine += ` · 🤖 ${escapeMarkdownV2(formatModelName(data.model))}`;
-      }
-      parts.push(statsLine);
-    } else if (data.model) {
+      const inLabel = escapeMarkdownV2(`In: ${formatTokenCount(data.inputTokens)}`);
+      const outLabel = escapeMarkdownV2(`Out: ${formatTokenCount(data.outputTokens)}`);
+      parts.push(`📊 ${inLabel} · ${outLabel}`);
+    }
+
+    if (data.model) {
       parts.push(`🤖 ${escapeMarkdownV2(formatModelName(data.model))}`);
     }
 
