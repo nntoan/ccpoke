@@ -237,6 +237,7 @@ export class DiscordChannel implements NotificationChannel {
   private registerInteractionHandler(): void {
     this.client.on("interactionCreate", async (interaction) => {
       try {
+        if (interaction.user.id !== this.cfg.discord_user_id) return;
         if (interaction.isChatInputCommand()) {
           if (interaction.commandName === "sessions") {
             await this.sessionCommandHandler?.handleSessionsCommand(interaction);
@@ -297,12 +298,6 @@ export class DiscordChannel implements NotificationChannel {
       if (msg.reference?.messageId) {
         matchedKey = msg.reference.messageId;
         elicitation = this.pendingElicitations.get(matchedKey);
-      }
-
-      if (!elicitation && this.pendingElicitations.size === 1) {
-        const [key, value] = [...this.pendingElicitations.entries()][0]!;
-        matchedKey = key;
-        elicitation = value;
       }
 
       if (!elicitation || !matchedKey) return;
