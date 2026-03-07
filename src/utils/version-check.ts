@@ -86,7 +86,7 @@ async function runUpdateInline(): Promise<
   const [bin, ...args] = cmd.split(" ");
 
   return new Promise((resolve) => {
-    const child = spawn(bin!, args, { stdio: "pipe" });
+    const child = spawn(bin!, args, { stdio: "pipe", shell: true });
     const chunks: Buffer[] = [];
 
     child.stderr?.on("data", (chunk: Buffer) => chunks.push(chunk));
@@ -117,14 +117,8 @@ export async function promptUpdateOrContinue(info: UpdateInfo): Promise<void> {
     return;
   }
 
-  const shouldUpdate = await p.confirm({
-    message: `${versionRange} — ${t("versionCheck.updateConfirm")}`,
-  });
-
-  if (p.isCancel(shouldUpdate) || !shouldUpdate) return;
-
   const s = p.spinner();
-  s.start(t("versionCheck.updating"));
+  s.start(`${versionRange} — ${t("versionCheck.updating")}`);
 
   const result = await runUpdateInline();
 

@@ -9,6 +9,7 @@ import {
 
 import { ApiRoute, isWindows } from "../../utils/constants.js";
 import { getPackageVersion, paths, toPosixPath } from "../../utils/paths.js";
+import { buildWindowsHookScript } from "../../utils/windows-hook-script-builder.js";
 import { AgentName } from "../types.js";
 
 const VERSION_HEADER_PATTERN = /^#\s*ccpoke-version:\s*(\S+)/;
@@ -196,8 +197,11 @@ export class ClaudeCodeInstaller {
     const version = getPackageVersion();
 
     if (isWindows()) {
-      const script = `@REM ccpoke-version: ${version}\n@echo off\ncurl -s -X POST http://localhost:${hookPort}${ApiRoute.HookStop}${agentParam} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`;
-      writeFileSync(paths.claudeCodeHookScript, script, { mode: 0o644 });
+      writeFileSync(
+        paths.claudeCodeHookScript,
+        buildWindowsHookScript(version, hookPort, `${ApiRoute.HookStop}${agentParam}`, hookSecret),
+        { mode: 0o644 }
+      );
       return;
     }
 
@@ -228,8 +232,11 @@ echo "$INPUT" | curl -s -X POST "http://localhost:${hookPort}${ApiRoute.HookStop
     const version = getPackageVersion();
 
     if (isWindows()) {
-      const script = `@REM ccpoke-version: ${version}\n@echo off\ncurl -s -X POST http://127.0.0.1:${hookPort}${ApiRoute.HookSessionStart} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`;
-      writeFileSync(paths.claudeCodeSessionStartScript, script, { mode: 0o644 });
+      writeFileSync(
+        paths.claudeCodeSessionStartScript,
+        buildWindowsHookScript(version, hookPort, ApiRoute.HookSessionStart, hookSecret),
+        { mode: 0o644 }
+      );
       return;
     }
     const script = `#!/bin/bash
@@ -270,8 +277,11 @@ curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookSessionStart}" \\
     const version = getPackageVersion();
 
     if (isWindows()) {
-      const script = `@REM ccpoke-version: ${version}\n@echo off\ncurl -s -X POST http://127.0.0.1:${hookPort}${ApiRoute.HookNotification} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`;
-      writeFileSync(paths.claudeCodeNotificationScript, script, { mode: 0o644 });
+      writeFileSync(
+        paths.claudeCodeNotificationScript,
+        buildWindowsHookScript(version, hookPort, ApiRoute.HookNotification, hookSecret),
+        { mode: 0o644 }
+      );
       return;
     }
     const script = `#!/bin/bash
@@ -310,8 +320,11 @@ echo "$PAYLOAD" | curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookNo
     const version = getPackageVersion();
 
     if (isWindows()) {
-      const script = `@REM ccpoke-version: ${version}\n@echo off\ncurl -s -X POST http://127.0.0.1:${hookPort}${ApiRoute.HookAskUserQuestion} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`;
-      writeFileSync(paths.claudeCodePreToolUseScript, script, { mode: 0o644 });
+      writeFileSync(
+        paths.claudeCodePreToolUseScript,
+        buildWindowsHookScript(version, hookPort, ApiRoute.HookAskUserQuestion, hookSecret),
+        { mode: 0o644 }
+      );
       return;
     }
     const script = `#!/bin/bash
@@ -352,8 +365,11 @@ echo "$PAYLOAD" | curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookAs
     const version = getPackageVersion();
 
     if (isWindows()) {
-      const script = `@REM ccpoke-version: ${version}\n@echo off\ncurl -s -X POST http://127.0.0.1:${hookPort}${ApiRoute.HookPermissionRequest} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`;
-      writeFileSync(paths.claudeCodePermissionRequestScript, script, { mode: 0o644 });
+      writeFileSync(
+        paths.claudeCodePermissionRequestScript,
+        buildWindowsHookScript(version, hookPort, ApiRoute.HookPermissionRequest, hookSecret),
+        { mode: 0o644 }
+      );
       return;
     }
     const script = `#!/bin/bash

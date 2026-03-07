@@ -64,6 +64,21 @@ export class ApiServer {
   private createApp(): Express {
     const app = express();
     app.use(express.json({ limit: "256kb" }));
+    app.use(
+      (
+        err: Error & { status?: number; type?: string },
+        _req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+      ) => {
+        if (err.type === "entity.parse.failed") {
+          logDebug(`[API] malformed JSON body: ${err.message}`);
+          res.status(400).json({ error: "invalid_json" });
+          return;
+        }
+        next(err);
+      }
+    );
     app.get(ApiRoute.ResponseData, (req, res) => {
       logDebug(
         `[API] GET ${ApiRoute.ResponseData} id=${req.params.id} origin=${req.headers.origin ?? "none"}`

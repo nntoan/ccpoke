@@ -125,7 +125,7 @@ export class CodexInstaller {
     const agentParam = `?agent=${AgentName.Codex}`;
 
     if (isWindows()) {
-      const script = `@REM ccpoke-version: ${version}\n@echo off\necho %~1 | curl -s -X POST http://localhost:${hookPort}${ApiRoute.HookStop}${agentParam} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`;
+      const script = `@REM ccpoke-version: ${version}\r\n@echo off\r\ncurl -s -X POST http://127.0.0.1:${hookPort}${ApiRoute.HookStop}${agentParam} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" -d "%~1" > nul 2>&1\r\n`;
       writeFileSync(paths.codexHookScript, script, { mode: 0o644 });
       return;
     }

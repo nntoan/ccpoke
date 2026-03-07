@@ -3,6 +3,7 @@ import { dirname } from "node:path";
 
 import { isWindows } from "../../utils/constants.js";
 import { getPackageVersion, paths, toPosixPath } from "../../utils/paths.js";
+import { buildWindowsHookScript } from "../../utils/windows-hook-script-builder.js";
 import {
   buildHookConfigs,
   hasCcpokeHook,
@@ -92,8 +93,11 @@ export class GeminiCliInstaller {
     const version = getPackageVersion();
 
     if (isWindows()) {
-      const script = `@REM ccpoke-version: ${version}\n@echo off\ncurl -s -X POST http://localhost:${hookPort}${cfg.route} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`;
-      writeFileSync(cfg.scriptPath, script, { mode: 0o644 });
+      writeFileSync(
+        cfg.scriptPath,
+        buildWindowsHookScript(version, hookPort, cfg.route, hookSecret),
+        { mode: 0o644 }
+      );
       return;
     }
 

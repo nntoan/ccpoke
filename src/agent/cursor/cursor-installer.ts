@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "
 
 import { ApiRoute, isWindows } from "../../utils/constants.js";
 import { getPackageVersion, paths, toPosixPath } from "../../utils/paths.js";
+import { buildWindowsHookScript } from "../../utils/windows-hook-script-builder.js";
 import { AgentName } from "../types.js";
 
 const VERSION_HEADER_PATTERN = /^#\s*ccpoke-version:\s*(\S+)/;
@@ -113,9 +114,16 @@ export class CursorInstaller {
 
     const agentParam = `?agent=${AgentName.Cursor}`;
     const version = getPackageVersion();
-    const script = isWindows()
-      ? `@REM ccpoke-version: ${version}\n@echo off\ncurl -s -X POST http://localhost:${hookPort}${ApiRoute.HookStop}${agentParam} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`
-      : `#!/bin/bash
+    if (isWindows()) {
+      writeFileSync(
+        paths.cursorHookScript,
+        buildWindowsHookScript(version, hookPort, `${ApiRoute.HookStop}${agentParam}`, hookSecret),
+        { mode: 0o644 }
+      );
+      return;
+    }
+
+    const script = `#!/bin/bash
 # ccpoke-version: ${version}
 INPUT=$(cat | tr -d '\\n\\r')
 [ -z "$INPUT" ] && exit 0
@@ -134,7 +142,7 @@ echo "$INPUT" | curl -s -X POST "http://localhost:${hookPort}${ApiRoute.HookStop
   --data-binary @- > /dev/null 2>&1 || true
 `;
 
-    writeFileSync(paths.cursorHookScript, script, { mode: isWindows() ? 0o644 : 0o700 });
+    writeFileSync(paths.cursorHookScript, script, { mode: 0o700 });
   }
 
   private static removeScript(): void {
