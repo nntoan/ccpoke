@@ -34,7 +34,7 @@ export const vi: TranslationKeys = {
     firstTimeSetup: "chưa có config — bắt đầu setup...",
     globalInstallTip: "💡 Tip: chạy 'npm i -g ccpoke' để khởi động nhanh hơn",
     alreadyRunning:
-      "một ccpoke khác đang chạy trên port {port}\n\n  Để dừng nó:\n    kill $(lsof -ti:{port})\n",
+      "một ccpoke khác đang chạy trên port {port}\n\n  Để dừng nó:\n    {killCommand}\n",
     twowayEnabled: "📱 Chat 2 chiều: đã bật",
     twowayDisabled: "📱 Chat 2 chiều: tắt (không có tmux)",
   },
@@ -77,9 +77,15 @@ export const vi: TranslationKeys = {
     tmuxInstallFailed:
       "Không thể cài tmux tự động. Hãy cài thủ công:\n  macOS: brew install tmux\n  Linux: sudo apt install tmux",
     tmuxInstallSkipped: "Bỏ qua cài tmux — chat 2 chiều tắt, notification vẫn hoạt động",
-    psmuxInstallPrompt: "Cài psmux để sử dụng tính năng chat 2 chiều trên Windows?",
-    psmuxInstallFailed:
-      "Không tìm thấy trình quản lý gói (winget, scoop, choco). Cài một trong chúng rồi chạy lại setup.",
+    tmuxWindowsInstallPrompt: "Cài tmux để sử dụng tính năng chat 2 chiều trên Windows?",
+    tmuxWindowsInstallFailed:
+      "Cài tmux thất bại. Thử cài thủ công:\n  irm https://raw.githubusercontent.com/marlocarlo/psmux/master/scripts/install.ps1 | iex",
+    scoopAutoInstallPrompt:
+      "Không tìm thấy package manager nào (winget/scoop/choco). Tự động cài Scoop để tiếp tục?",
+    scoopInstallFailed:
+      "Cài Scoop thất bại. Hãy cài package manager thủ công:\n  Scoop: irm get.scoop.sh | iex\n  Sau đó chạy lại: ccpoke setup",
+    tmuxWindowsPathRefreshHint:
+      "Để dùng tmux, hãy tắt hoàn toàn VS Code (không phải Reload Window) rồi mở lại để PATH được cập nhật.",
     addProjectPrompt: "Thêm project để tạo session agent?",
     addAnotherProject: "Thêm project khác?",
     projectAdded: 'Đã thêm "{name}" → {path}',

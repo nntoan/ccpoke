@@ -200,11 +200,15 @@ export class SessionMap {
 
     // Register new panes not yet tracked (dedup handled by register())
     for (const pane of panes) {
+      logDebug(`[Scan:pane] target=${pane.target} cwd=${pane.cwd} pid=${pane.panePid}`);
       const existing = [...this.sessions.values()].find((s) => s.tmuxTarget === pane.target);
       if (existing) {
         // Update project/cwd if pane changed directory
         const currentProject = basename(pane.cwd) || "unknown";
         if (existing.project !== currentProject || existing.cwd !== pane.cwd) {
+          logDebug(
+            `[Scan:update] id=${existing.sessionId} project=${existing.project}→${currentProject} cwd=${existing.cwd}→${pane.cwd}`
+          );
           existing.project = currentProject;
           existing.cwd = pane.cwd;
         }
@@ -213,6 +217,7 @@ export class SessionMap {
 
       const syntheticId = `tmux-${pane.target.replace(/[:.]/g, "-")}`;
       const project = basename(pane.cwd) || "unknown";
+      logDebug(`[Scan:new] syntheticId=${syntheticId} target=${pane.target} project=${project}`);
       const agentName =
         "agentName" in pane ? (pane as { agentName: AgentName }).agentName : AgentName.ClaudeCode;
       const state = tmuxBridge.isAgentIdle(pane.target, tree)

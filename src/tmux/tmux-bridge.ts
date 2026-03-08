@@ -149,27 +149,55 @@ export class TmuxBridge {
   createPane(sessionName: string, cwd: string): string {
     const bin = getTmuxBinary();
     const dir = escapeShellArg(cwd);
+    const formatArg = escapeShellArg("#{session_name}:#{window_index}.#{pane_index}");
+
+    let paneTarget: string;
 
     if (!this.hasRunningSession(sessionName)) {
       const name = escapeShellArg(sessionName);
-      return execSync(
-        `${bin} new-session -d -s ${name} -c ${dir} -P -F ${escapeShellArg("#{session_name}:#{window_index}.#{pane_index}")}`,
-        { encoding: "utf-8", stdio: "pipe", timeout: 5000 }
-      ).trim();
+      paneTarget = execSync(`${bin} new-session -d -s ${name} -c ${dir} -P -F ${formatArg}`, {
+        encoding: "utf-8",
+        stdio: "pipe",
+        timeout: 5000,
+      }).trim();
+    } else {
+      const target = escapeShellArg(`${sessionName}:0`);
+      paneTarget = execSync(`${bin} split-window -t ${target} -c ${dir} -P -F ${formatArg}`, {
+        encoding: "utf-8",
+        stdio: "pipe",
+        timeout: 5000,
+      }).trim();
+
+      execSync(`${bin} select-layout -t ${target} tiled`, {
+        stdio: "pipe",
+        timeout: 3000,
+      });
     }
 
-    const target = escapeShellArg(`${sessionName}:0`);
-    const paneTarget = execSync(
-      `${bin} split-window -t ${target} -c ${dir} -P -F ${escapeShellArg("#{session_name}:#{window_index}.#{pane_index}")}`,
-      { encoding: "utf-8", stdio: "pipe", timeout: 5000 }
-    ).trim();
-
-    execSync(`${bin} select-layout -t ${target} tiled`, {
-      stdio: "pipe",
-      timeout: 3000,
-    });
+    if (isWindows()) {
+      this.changePaneCwd(paneTarget, cwd);
+    }
 
     return paneTarget;
+  }
+
+  private changePaneCwd(paneTarget: string, cwd: string): void {
+    const bin = getTmuxBinary();
+    const tgt = escapeShellArg(paneTarget);
+
+    busyWaitMs(200);
+    const commands = [`cd ${cwd}`, "cls"];
+    for (const cmd of commands) {
+      execSync(`${bin} send-keys -t ${tgt} -l ${escapeTmuxText(cmd)}`, {
+        stdio: "pipe",
+        timeout: 5000,
+      });
+      execSync(`${bin} send-keys -t ${tgt} Enter`, {
+        stdio: "pipe",
+        timeout: 5000,
+      });
+      busyWaitMs(200);
+    }
   }
 
   private hasRunningSession(sessionName: string): boolean {
@@ -195,12 +223,7 @@ export class TmuxBridge {
 function escapeTmuxText(text: string): string {
   const cleaned = text.replace(/\r/g, "");
   if (isWindows()) {
-    const escaped = cleaned
-      .replace(/\\/g, "\\\\")
-      .replace(/"/g, '""')
-      .replace(/%/g, "%%")
-      .replace(/!/g, "^^!")
-      .replace(/([&|<>^])/g, "^$1");
+    const escaped = cleaned.replace(/\\/g, "\\\\").replace(/"/g, '""').replace(/%/g, "%%");
     return `"${escaped}"`;
   }
   const escaped = cleaned

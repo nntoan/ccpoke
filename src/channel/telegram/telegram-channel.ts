@@ -504,6 +504,11 @@ export class TelegramChannel implements NotificationChannel {
 
       const sessions = this.sessionMap.getAllActive();
       logDebug(`[/sessions] count=${sessions.length}`);
+      for (const s of sessions) {
+        logDebug(
+          `[/sessions:dump] id=${s.sessionId} target=${s.tmuxTarget} project=${s.project} cwd=${s.cwd}`
+        );
+      }
       const { text, replyMarkup } = formatSessionList(sessions);
 
       const opts: TelegramBot.SendMessageOptions = { parse_mode: "MarkdownV2" };
@@ -631,9 +636,13 @@ export class TelegramChannel implements NotificationChannel {
 
     const session = this.resolveSession(sessionId);
     if (!session) {
+      logDebug(`[Session:callback] NOT FOUND sessionId=${sessionId}`);
       await this.bot.answerCallbackQuery(query.id, { text: t("chat.sessionExpired") });
       return;
     }
+    logDebug(
+      `[Session:callback] resolved id=${sessionId} → target=${session.tmuxTarget} project=${session.project}`
+    );
 
     await this.bot.answerCallbackQuery(query.id);
     await this.bot.sendMessage(query.message.chat.id, `*${escapeMarkdownV2(session.project)}*`, {

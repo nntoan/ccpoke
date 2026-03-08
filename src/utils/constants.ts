@@ -1,3 +1,5 @@
+import { execSync } from "node:child_process";
+
 export const GitChangeStatus = {
   Modified: "modified",
   Added: "added",
@@ -78,4 +80,21 @@ export function isMacOS(): boolean {
 
 export function isLinux(): boolean {
   return currentPlatform === Platform.Linux;
+}
+
+export function refreshWindowsPath(): void {
+  if (!isWindows()) return;
+  try {
+    const userPath = execSync(
+      "powershell -NoProfile -Command \"[Environment]::GetEnvironmentVariable('Path', 'User')\"",
+      { encoding: "utf-8", stdio: "pipe", timeout: 5000 }
+    ).trim();
+    const machinePath = execSync(
+      "powershell -NoProfile -Command \"[Environment]::GetEnvironmentVariable('Path', 'Machine')\"",
+      { encoding: "utf-8", stdio: "pipe", timeout: 5000 }
+    ).trim();
+    process.env.PATH = `${userPath};${machinePath}`;
+  } catch {
+    /* best-effort */
+  }
 }

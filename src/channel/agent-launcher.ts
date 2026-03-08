@@ -2,6 +2,7 @@ import { execSync } from "node:child_process";
 
 import { AgentName } from "../agent/types.js";
 import { getTmuxBinary, type TmuxBridge } from "../tmux/tmux-bridge.js";
+import { isWindows } from "../utils/constants.js";
 import { logDebug } from "../utils/log.js";
 import { escapeShellArg } from "../utils/shell.js";
 
@@ -23,7 +24,10 @@ export function launchAgent(
   const tmuxSession = getTmuxSessionName();
   const paneTarget = tmuxBridge.createPane(tmuxSession, projectPath);
   tmuxBridge.sendKeys(paneTarget, startCommand, ["Enter"]);
-  const needsTrust = agentKey === AgentName.Cursor || agentKey === AgentName.GeminiCli;
+  const needsTrust =
+    agentKey === AgentName.ClaudeCode ||
+    agentKey === AgentName.Cursor ||
+    agentKey === AgentName.GeminiCli;
   return { paneTarget, needsTrust };
 }
 
@@ -76,6 +80,16 @@ function getTmuxSessionName(): string {
   }
 
   try {
+    if (isWindows()) {
+      const output = execSync(`${bin} ls`, {
+        encoding: "utf-8",
+        stdio: "pipe",
+        timeout: 3000,
+      }).trim();
+      const match = output.split("\n")[0]?.match(/^(\S+?):/);
+      return match?.[1] || "0";
+    }
+
     const output = execSync(`${bin} list-sessions -F ${escapeShellArg("#{session_name}")}`, {
       encoding: "utf-8",
       stdio: "pipe",

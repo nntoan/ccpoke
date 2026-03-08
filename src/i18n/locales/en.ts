@@ -34,7 +34,7 @@ export const en: TranslationKeys = {
     firstTimeSetup: "no config found — starting setup wizard...",
     globalInstallTip: "💡 Tip: run 'npm i -g ccpoke' for faster startup",
     alreadyRunning:
-      "another ccpoke is already running on port {port}\n\n  To stop it:\n    kill $(lsof -ti:{port})\n",
+      "another ccpoke is already running on port {port}\n\n  To stop it:\n    {killCommand}\n",
     twowayEnabled: "📱 2-way chat: enabled",
     twowayDisabled: "📱 2-way chat: disabled (no tmux)",
   },
@@ -77,9 +77,15 @@ export const en: TranslationKeys = {
     tmuxInstallFailed:
       "Failed to install tmux automatically. Install it manually:\n  macOS: brew install tmux\n  Linux: sudo apt install tmux",
     tmuxInstallSkipped: "Skipped tmux install — 2-way chat disabled, notifications still work",
-    psmuxInstallPrompt: "Install psmux for 2-way chat support on Windows?",
-    psmuxInstallFailed:
-      "No package manager found (winget, scoop, choco). Install one first, then re-run setup.",
+    tmuxWindowsInstallPrompt: "Install tmux for 2-way chat support on Windows?",
+    tmuxWindowsInstallFailed:
+      "Failed to install tmux. Try manually:\n  irm https://raw.githubusercontent.com/marlocarlo/psmux/master/scripts/install.ps1 | iex",
+    scoopAutoInstallPrompt:
+      "No package manager found (winget/scoop/choco). Install Scoop automatically to continue?",
+    scoopInstallFailed:
+      "Failed to install Scoop. Install a package manager manually:\n  Scoop: irm get.scoop.sh | iex\n  Then re-run: ccpoke setup",
+    tmuxWindowsPathRefreshHint:
+      "To use tmux, fully close VS Code (not just Reload Window) and reopen it so the updated PATH takes effect.",
     addProjectPrompt: "Add a project to create agent sessions?",
     addAnotherProject: "Add another project?",
     projectAdded: 'Added "{name}" → {path}',

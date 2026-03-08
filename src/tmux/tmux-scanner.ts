@@ -195,20 +195,56 @@ export interface AgentScanOutput {
   tree: ProcessTree;
 }
 
-export function scanAgentPanes(): AgentScanOutput {
-  try {
-    const output = execSync(
-      `${getTmuxBinary()} list-panes -a -F ${escapeShellArg(FORMAT_STRING)}`,
-      {
+function listAllPanesRaw(): string {
+  const bin = getTmuxBinary();
+  const formatArg = escapeShellArg(FORMAT_STRING);
+
+  if (!isWindows()) {
+    return execSync(`${bin} list-panes -a -F ${formatArg}`, {
+      encoding: "utf-8",
+      stdio: "pipe",
+      timeout: 5000,
+    });
+  }
+
+  const sessionListOutput = execSync(`${bin} ls`, {
+    encoding: "utf-8",
+    stdio: "pipe",
+    timeout: 5000,
+  });
+
+  const sessionNames = sessionListOutput
+    .trim()
+    .split("\n")
+    .map((line) => line.match(/^(\S+?):/)?.[1])
+    .filter((name): name is string => !!name);
+
+  if (sessionNames.length === 0) return "";
+
+  const results: string[] = [];
+  for (const name of sessionNames) {
+    try {
+      const out = execSync(`${bin} list-panes -t ${escapeShellArg(name)} -F ${formatArg}`, {
         encoding: "utf-8",
         stdio: "pipe",
         timeout: 5000,
-      }
-    );
+      });
+      results.push(out.trim());
+    } catch {
+      // session may have been killed between ls and list-panes
+    }
+  }
+  return results.join("\n");
+}
+
+export function scanAgentPanes(): AgentScanOutput {
+  try {
+    const output = listAllPanesRaw();
 
     const tree = buildProcessTree();
 
     const panes: AgentPaneInfo[] = output
+      .replace(/\r/g, "")
       .trim()
       .split("\n")
       .filter((line) => line.length > 0)

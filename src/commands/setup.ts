@@ -13,7 +13,13 @@ import { AgentName } from "../agent/types.js";
 import { ConfigManager, type Config } from "../config-manager.js";
 import { Locale, LOCALE_LABELS, setLocale, SUPPORTED_LOCALES, t } from "../i18n/index.js";
 import { resetTmuxBinaryCache } from "../tmux/tmux-bridge.js";
-import { ChannelName, DEFAULT_HOOK_PORT, isMacOS, isWindows } from "../utils/constants.js";
+import {
+  ChannelName,
+  DEFAULT_HOOK_PORT,
+  isMacOS,
+  isWindows,
+  refreshWindowsPath,
+} from "../utils/constants.js";
 import { detectCliPrefix } from "../utils/install-detection.js";
 import { promptPath } from "../utils/path-prompt.js";
 import { installShellCompletion } from "../utils/shell-completion.js";
@@ -596,9 +602,14 @@ async function verifySlackChannelMembership(token: string, channelId: string): P
   spinner.stop(t("setup.slackChannelNotMember", { name: botName }));
 }
 
+function parseVersionNumber(raw: string): string {
+  return raw.replace(/^\S+\s+/, "").trim() || raw.trim();
+}
+
 function getTmuxVersion(): string | null {
   try {
-    return execSync("tmux -V", { stdio: "pipe", encoding: "utf-8" }).trim();
+    const raw = execSync("tmux -V", { stdio: "pipe", encoding: "utf-8" }).trim();
+    return parseVersionNumber(raw);
   } catch {
     return null;
   }
@@ -606,7 +617,7 @@ function getTmuxVersion(): string | null {
 
 function detectTmuxInstallCommand(): string | null {
   if (isWindows()) {
-    return detectPsmuxInstallCommand();
+    return detectPsmuxInstaller()?.install ?? null;
   }
 
   if (isMacOS()) {
@@ -648,16 +659,47 @@ const PSMUX_INSTALLERS: PsmuxInstaller[] = [
   { name: "choco", check: "choco --version", install: "choco install psmux -y" },
 ];
 
-function detectPsmuxInstallCommand(): string | null {
+function detectPsmuxInstaller(): PsmuxInstaller | null {
   for (const installer of PSMUX_INSTALLERS) {
     try {
       execSync(installer.check, { stdio: "pipe", timeout: 5000 });
-      return installer.install;
+      return installer;
     } catch {
       continue;
     }
   }
   return null;
+}
+
+async function installScoopAndRetry(): Promise<PsmuxInstaller | null> {
+  const shouldInstallScoop = await p.confirm({
+    message: t("setup.scoopAutoInstallPrompt"),
+    initialValue: true,
+  });
+
+  if (p.isCancel(shouldInstallScoop) || !shouldInstallScoop) {
+    return null;
+  }
+
+  const s = p.spinner();
+  s.start("Installing Scoop...");
+  try {
+    await spawnAsync("powershell.exe", [
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "RemoteSigned",
+      "-Command",
+      "$ErrorActionPreference='Stop'; Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; irm get.scoop.sh | iex",
+    ]);
+    refreshWindowsPath();
+    s.stop("Scoop installed");
+  } catch {
+    s.stop("Scoop install failed");
+    p.log.warn(t("setup.scoopInstallFailed"));
+    return null;
+  }
+
+  return detectPsmuxInstaller();
 }
 
 async function promptTmuxSetup(): Promise<void> {
@@ -669,7 +711,7 @@ async function promptTmuxSetup(): Promise<void> {
     }
 
     const shouldInstall = await p.confirm({
-      message: t("setup.psmuxInstallPrompt"),
+      message: t("setup.tmuxWindowsInstallPrompt"),
       initialValue: true,
     });
 
@@ -678,22 +720,26 @@ async function promptTmuxSetup(): Promise<void> {
       return;
     }
 
-    const installCmd = detectPsmuxInstallCommand();
-    if (!installCmd) {
-      p.log.warn(t("setup.psmuxInstallFailed"));
+    let installer = detectPsmuxInstaller();
+    if (!installer) {
+      installer = await installScoopAndRetry();
+    }
+    if (!installer) {
+      p.log.warn(t("setup.tmuxWindowsInstallFailed"));
       return;
     }
 
-    const installer = PSMUX_INSTALLERS.find((i) => i.install === installCmd)!;
     const s = p.spinner();
-    s.start(`${installer.name}: ${installCmd}`);
+    s.start(`${installer.name}: ${installer.install}`);
     try {
-      await runCommandAsync(installCmd);
+      await runCommandAsync(installer.install);
+      refreshWindowsPath();
       resetTmuxBinaryCache();
       s.stop(t("setup.tmuxInstallSuccess"));
+      p.log.info(t("setup.tmuxWindowsPathRefreshHint"));
     } catch {
       s.stop(`${installer.name} failed`);
-      p.log.warn(t("setup.psmuxInstallFailed"));
+      p.log.warn(t("setup.tmuxWindowsInstallFailed"));
     }
     return;
   }
@@ -733,15 +779,15 @@ async function promptTmuxSetup(): Promise<void> {
 
 function getPsmuxVersion(): string | null {
   try {
-    return execSync("psmux -V", { stdio: "pipe", encoding: "utf-8" }).trim();
+    const raw = execSync("psmux -V", { stdio: "pipe", encoding: "utf-8" }).trim();
+    return parseVersionNumber(raw);
   } catch {
     return null;
   }
 }
 
-function runCommandAsync(command: string): Promise<string> {
+function spawnAsync(cmd: string, args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    const { cmd, args } = shellSpawnArgs(command);
     const child = spawn(cmd, args, { stdio: "pipe" });
 
     let output = "";
@@ -764,6 +810,11 @@ function runCommandAsync(command: string): Promise<string> {
 
     child.on("error", reject);
   });
+}
+
+function runCommandAsync(command: string): Promise<string> {
+  const { cmd, args } = shellSpawnArgs(command);
+  return spawnAsync(cmd, args);
 }
 
 async function promptProjectSetup(config: Config): Promise<void> {

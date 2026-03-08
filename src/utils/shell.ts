@@ -2,11 +2,7 @@ import { isWindows } from "./constants.js";
 
 export function escapeShellArg(arg: string): string {
   if (isWindows()) {
-    const escaped = arg
-      .replace(/%/g, "%%")
-      .replace(/"/g, '""')
-      .replace(/!/g, "^^!")
-      .replace(/([&|<>^])/g, "^$1");
+    const escaped = arg.replace(/%/g, "%%").replace(/"/g, '""');
     return `"${escaped}"`;
   }
   return `'${arg.replace(/'/g, "'\\''")}'`;
