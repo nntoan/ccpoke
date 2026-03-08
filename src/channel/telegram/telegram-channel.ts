@@ -68,6 +68,7 @@ export class TelegramChannel implements NotificationChannel {
     this.registerProjectsHandlers();
     this.registerPollingErrorHandler();
     this.registerTakeoverListener();
+    this.patchProcessUpdate();
 
     this.pendingReplyStore.setOnCleanup((chatId, messageId) => {
       this.bot.deleteMessage(chatId, messageId).catch(() => {});
@@ -115,7 +116,6 @@ export class TelegramChannel implements NotificationChannel {
     await this.registerCommands();
     await this.registerMenuButton();
     log(t("bot.telegramStarted"));
-    log(`[DIAG] instanceId=${this.instanceId}`);
 
     if (this.chatId) {
       this.bot
@@ -245,11 +245,6 @@ export class TelegramChannel implements NotificationChannel {
         logDebug(
           `[TG:callback] id=${query.id} from=${query.from.id} data=${query.data ?? "(none)"}`
         );
-        if (this.processedUpdateIds.has(query.id)) {
-          logWarn(`[DIAG:DUP] callback_query DUPLICATE id=${query.id} data=${query.data}`);
-        }
-        this.processedUpdateIds.set(query.id, Date.now());
-        this.trimProcessedIds();
         if (!ConfigManager.isOwner(this.cfg, query.from.id)) {
           logDebug(`[TG:callback] dropped: unauthorized userId=${query.from.id}`);
           return;
@@ -496,12 +491,6 @@ export class TelegramChannel implements NotificationChannel {
   private registerSessionsHandlers(): void {
     this.bot.onText(/\/sessions(?:\s|$)/, (msg) => {
       if (!ConfigManager.isOwner(this.cfg, msg.from?.id ?? 0)) return;
-      const msgKey = `msg:${msg.message_id}:${msg.chat.id}`;
-      if (this.processedUpdateIds.has(msgKey)) {
-        logWarn(`[DIAG:DUP] /sessions DUPLICATE msgId=${msg.message_id} chatId=${msg.chat.id}`);
-      }
-      this.processedUpdateIds.set(msgKey, Date.now());
-      this.trimProcessedIds();
       if (!this.sessionMap) {
         this.bot.sendMessage(msg.chat.id, t("sessions.empty")).catch(() => {});
         return;
@@ -760,6 +749,27 @@ export class TelegramChannel implements NotificationChannel {
     });
   }
 
+  private patchProcessUpdate(): void {
+    const original = this.bot.processUpdate.bind(this.bot);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.bot.processUpdate = (update: any) => {
+      const uid = update.update_id as number;
+      const key = `uid:${uid}`;
+      this.lastPollingActivity = Date.now();
+      if (this.isDisconnected) {
+        this.isDisconnected = false;
+        log(t("bot.connectionRestored"));
+      }
+      if (this.processedUpdateIds.has(key)) {
+        logWarn(`[Polling] duplicate update_id=${uid} skipped`);
+        return;
+      }
+      this.processedUpdateIds.set(key, Date.now());
+      this.trimProcessedIds();
+      return original(update);
+    };
+  }
+
   private trimProcessedIds(): void {
     if (this.processedUpdateIds.size > 500) {
       const cutoff = Date.now() - 60_000;
@@ -775,7 +785,6 @@ export class TelegramChannel implements NotificationChannel {
       if (this.chatId && msg.chat.id !== this.chatId) return;
       const senderId = msg.text.slice("__ccpoke_takeover:".length);
       if (senderId === this.instanceId) return;
-      logWarn(`[DIAG:TAKEOVER] received from=${senderId} self=${this.instanceId}`);
       log(t("bot.instanceTakeover"));
       process.emit("SIGTERM", "SIGTERM");
     });
@@ -799,14 +808,6 @@ export class TelegramChannel implements NotificationChannel {
       }
     });
 
-    this.bot.on("polling", () => {
-      this.lastPollingActivity = Date.now();
-      if (this.isDisconnected) {
-        this.isDisconnected = false;
-        log(t("bot.connectionRestored"));
-      }
-    });
-
     this.heartbeatInterval = setInterval(() => {
       if (this.reconnectTimer) return;
       const staleMs = Date.now() - this.lastPollingActivity;
@@ -814,14 +815,14 @@ export class TelegramChannel implements NotificationChannel {
       logWarn(t("bot.pollingRestart"));
       this.isDisconnected = true;
       this.lastPollingActivity = Date.now();
-      try {
-        this.bot.stopPolling({ cancel: true, reason: "stale polling" });
-      } catch {
-        // already stopped
-      }
-      this.reconnectTimer = setTimeout(() => {
-        this.reconnectTimer = null;
+      this.reconnectTimer = setTimeout(async () => {
+        try {
+          await this.bot.stopPolling({ cancel: true, reason: "stale polling" });
+        } catch {
+          // already stopped
+        }
         this.bot.startPolling();
+        this.reconnectTimer = null;
         log(t("bot.pollingRestarted"));
       }, RESTART_DELAY_MS);
     }, HEARTBEAT_INTERVAL_MS);
