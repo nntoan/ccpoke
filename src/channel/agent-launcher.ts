@@ -1,8 +1,10 @@
 import { execSync } from "node:child_process";
 
 import { AgentName } from "../agent/types.js";
-import type { TmuxBridge } from "../tmux/tmux-bridge.js";
+import { getTmuxBinary, type TmuxBridge } from "../tmux/tmux-bridge.js";
+import { isWindows } from "../utils/constants.js";
 import { logDebug } from "../utils/log.js";
+import { escapeShellArg } from "../utils/shell.js";
 
 const AGENT_START_COMMANDS: Record<string, string> = {
   [AgentName.ClaudeCode]: "claude --dangerously-skip-permissions",
@@ -22,7 +24,10 @@ export function launchAgent(
   const tmuxSession = getTmuxSessionName();
   const paneTarget = tmuxBridge.createPane(tmuxSession, projectPath);
   tmuxBridge.sendKeys(paneTarget, startCommand, ["Enter"]);
-  const needsTrust = agentKey === AgentName.Cursor || agentKey === AgentName.GeminiCli;
+  const needsTrust =
+    agentKey === AgentName.ClaudeCode ||
+    agentKey === AgentName.Cursor ||
+    agentKey === AgentName.GeminiCli;
   return { paneTarget, needsTrust };
 }
 
@@ -61,9 +66,10 @@ export function autoTrustWorkspace(
 }
 
 function getTmuxSessionName(): string {
+  const bin = getTmuxBinary();
   if (process.env.TMUX) {
     try {
-      return execSync("tmux display-message -p '#{session_name}'", {
+      return execSync(`${bin} display-message -p ${escapeShellArg("#{session_name}")}`, {
         encoding: "utf-8",
         stdio: "pipe",
         timeout: 3000,
@@ -74,7 +80,17 @@ function getTmuxSessionName(): string {
   }
 
   try {
-    const output = execSync("tmux list-sessions -F '#{session_name}'", {
+    if (isWindows()) {
+      const output = execSync(`${bin} ls`, {
+        encoding: "utf-8",
+        stdio: "pipe",
+        timeout: 3000,
+      }).trim();
+      const match = output.split("\n")[0]?.match(/^(\S+?):/);
+      return match?.[1] || "0";
+    }
+
+    const output = execSync(`${bin} list-sessions -F ${escapeShellArg("#{session_name}")}`, {
       encoding: "utf-8",
       stdio: "pipe",
       timeout: 3000,

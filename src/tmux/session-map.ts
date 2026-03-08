@@ -205,6 +205,9 @@ export class SessionMap {
         // Update project/cwd if pane changed directory
         const currentProject = basename(pane.cwd) || "unknown";
         if (existing.project !== currentProject || existing.cwd !== pane.cwd) {
+          logDebug(
+            `[Scan:update] id=${existing.sessionId} project=${existing.project}→${currentProject} cwd=${existing.cwd}→${pane.cwd}`
+          );
           existing.project = currentProject;
           existing.cwd = pane.cwd;
         }
@@ -213,6 +216,7 @@ export class SessionMap {
 
       const syntheticId = `tmux-${pane.target.replace(/[:.]/g, "-")}`;
       const project = basename(pane.cwd) || "unknown";
+      logDebug(`[Scan:new] syntheticId=${syntheticId} target=${pane.target} project=${project}`);
       const agentName =
         "agentName" in pane ? (pane as { agentName: AgentName }).agentName : AgentName.ClaudeCode;
       const state = tmuxBridge.isAgentIdle(pane.target, tree)

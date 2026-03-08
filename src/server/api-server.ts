@@ -5,7 +5,7 @@ import express, { type Express } from "express";
 import { AgentHandler } from "../agent/agent-handler.js";
 import { AgentName } from "../agent/types.js";
 import { t } from "../i18n/index.js";
-import { ApiRoute, MINI_APP_BASE_URL } from "../utils/constants.js";
+import { ApiRoute, isWindows, MINI_APP_BASE_URL } from "../utils/constants.js";
 import { log, logDebug, logError } from "../utils/log.js";
 import { responseStore } from "../utils/response-store.js";
 import type { TunnelManager } from "../utils/tunnel.js";
@@ -43,7 +43,10 @@ export class ApiServer {
 
       this.server.on("error", (err: NodeJS.ErrnoException) => {
         if (err.code === "EADDRINUSE") {
-          logError(t("bot.alreadyRunning", { port: this.port }));
+          const killCommand = isWindows()
+            ? `Stop-Process -Id (Get-NetTCPConnection -LocalPort ${this.port}).OwningProcess -Force`
+            : `kill $(lsof -ti:${this.port})`;
+          logError(t("bot.alreadyRunning", { port: this.port, killCommand }));
           process.exit(1);
         }
         reject(err);

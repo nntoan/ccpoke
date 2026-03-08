@@ -20,12 +20,14 @@ import { SessionMap } from "./tmux/session-map.js";
 import { SessionStateManager } from "./tmux/session-state.js";
 import { TmuxBridge } from "./tmux/tmux-bridge.js";
 import { TmuxSessionResolver } from "./tmux/tmux-session-resolver.js";
-import { ChannelName, CliCommand, InstallMethod, isWindows } from "./utils/constants.js";
+import { ChannelName, CliCommand, InstallMethod, refreshWindowsPath } from "./utils/constants.js";
 import { detectInstallMethod } from "./utils/install-detection.js";
 import { log, logError, logWarn } from "./utils/log.js";
 import { ensureShellCompletion } from "./utils/shell-completion.js";
 import { TunnelManager } from "./utils/tunnel.js";
 import { checkForUpdates } from "./utils/version-check.js";
+
+refreshWindowsPath();
 
 const args = process.argv.slice(2);
 
@@ -83,10 +85,6 @@ function formatWarningBox(msg: string): string {
 
 async function startBot(): Promise<void> {
   await checkForUpdates().catch(() => {});
-
-  if (isWindows()) {
-    logWarn(formatWarningBox(t("bot.windowsNoTwoWay")), { showTimestamp: false });
-  }
 
   const cfg = await loadOrSetupConfig();
   ensureShellCompletion();

@@ -33,7 +33,6 @@ export interface TranslationKeys {
     alreadyRunning: string;
     twowayEnabled: string;
     twowayDisabled: string;
-    windowsNoTwoWay: string;
   };
   setup: {
     intro: string;
@@ -71,6 +70,11 @@ export interface TranslationKeys {
     tmuxInstallSuccess: string;
     tmuxInstallFailed: string;
     tmuxInstallSkipped: string;
+    tmuxWindowsInstallPrompt: string;
+    tmuxWindowsInstallFailed: string;
+    scoopAutoInstallPrompt: string;
+    scoopInstallFailed: string;
+    tmuxWindowsPathRefreshHint: string;
     addProjectPrompt: string;
     addAnotherProject: string;
     projectAdded: string;
