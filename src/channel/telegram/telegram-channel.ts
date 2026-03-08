@@ -47,6 +47,7 @@ export class TelegramChannel implements NotificationChannel {
   private promptHandler: PromptHandler | null = null;
   private askQuestionHandler: AskQuestionHandler | null = null;
   private permissionRequestHandler: PermissionRequestHandler | null = null;
+  private processedUpdateIds = new Map<string, number>();
 
   constructor(cfg: Config, deps?: ChannelDeps) {
     this.cfg = cfg;
@@ -114,6 +115,7 @@ export class TelegramChannel implements NotificationChannel {
     await this.registerCommands();
     await this.registerMenuButton();
     log(t("bot.telegramStarted"));
+    log(`[DIAG] instanceId=${this.instanceId}`);
 
     if (this.chatId) {
       this.bot
@@ -243,6 +245,11 @@ export class TelegramChannel implements NotificationChannel {
         logDebug(
           `[TG:callback] id=${query.id} from=${query.from.id} data=${query.data ?? "(none)"}`
         );
+        if (this.processedUpdateIds.has(query.id)) {
+          logWarn(`[DIAG:DUP] callback_query DUPLICATE id=${query.id} data=${query.data}`);
+        }
+        this.processedUpdateIds.set(query.id, Date.now());
+        this.trimProcessedIds();
         if (!ConfigManager.isOwner(this.cfg, query.from.id)) {
           logDebug(`[TG:callback] dropped: unauthorized userId=${query.from.id}`);
           return;
@@ -489,6 +496,12 @@ export class TelegramChannel implements NotificationChannel {
   private registerSessionsHandlers(): void {
     this.bot.onText(/\/sessions(?:\s|$)/, (msg) => {
       if (!ConfigManager.isOwner(this.cfg, msg.from?.id ?? 0)) return;
+      const msgKey = `msg:${msg.message_id}:${msg.chat.id}`;
+      if (this.processedUpdateIds.has(msgKey)) {
+        logWarn(`[DIAG:DUP] /sessions DUPLICATE msgId=${msg.message_id} chatId=${msg.chat.id}`);
+      }
+      this.processedUpdateIds.set(msgKey, Date.now());
+      this.trimProcessedIds();
       if (!this.sessionMap) {
         this.bot.sendMessage(msg.chat.id, t("sessions.empty")).catch(() => {});
         return;
@@ -747,12 +760,22 @@ export class TelegramChannel implements NotificationChannel {
     });
   }
 
+  private trimProcessedIds(): void {
+    if (this.processedUpdateIds.size > 500) {
+      const cutoff = Date.now() - 60_000;
+      for (const [key, ts] of this.processedUpdateIds) {
+        if (ts < cutoff) this.processedUpdateIds.delete(key);
+      }
+    }
+  }
+
   private registerTakeoverListener(): void {
     this.bot.on("message", (msg) => {
       if (!msg.text?.startsWith("__ccpoke_takeover:")) return;
       if (this.chatId && msg.chat.id !== this.chatId) return;
       const senderId = msg.text.slice("__ccpoke_takeover:".length);
       if (senderId === this.instanceId) return;
+      logWarn(`[DIAG:TAKEOVER] received from=${senderId} self=${this.instanceId}`);
       log(t("bot.instanceTakeover"));
       process.emit("SIGTERM", "SIGTERM");
     });
