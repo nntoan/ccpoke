@@ -81,7 +81,7 @@ export const zh: TranslationKeys = {
     psmuxDownloading: "正在从 GitHub 下载 psmux...",
     psmuxDownloadFailed: "从 GitHub 下载 psmux 失败",
     tmuxWindowsPathRefreshHint:
-      "要使用 tmux，请完全关闭 VS Code（不是 Reload Window），然后重新打开以使更新的 PATH 生效。",
+      "要使用 tmux，请关闭当前终端或 VS Code，然后重新打开以使更新的 PATH 生效。",
     addProjectPrompt: "添加项目以创建 agent 会话？",
     addAnotherProject: "添加另一个项目？",
     projectAdded: '已添加 "{name}" → {path}',
