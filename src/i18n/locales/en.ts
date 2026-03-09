@@ -83,7 +83,7 @@ export const en: TranslationKeys = {
     psmuxDownloading: "Downloading psmux from GitHub...",
     psmuxDownloadFailed: "Failed to download psmux from GitHub",
     tmuxWindowsPathRefreshHint:
-      "To use tmux, fully close VS Code (not just Reload Window) and reopen it so the updated PATH takes effect.",
+      "To use tmux, close your current terminal or VS Code and reopen it so the updated PATH takes effect.",
     addProjectPrompt: "Add a project to create agent sessions?",
     addAnotherProject: "Add another project?",
     projectAdded: 'Added "{name}" → {path}',

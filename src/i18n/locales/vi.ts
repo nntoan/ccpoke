@@ -83,7 +83,7 @@ export const vi: TranslationKeys = {
     psmuxDownloading: "Đang tải psmux từ GitHub...",
     psmuxDownloadFailed: "Tải psmux từ GitHub thất bại",
     tmuxWindowsPathRefreshHint:
-      "Để dùng tmux, hãy tắt hoàn toàn VS Code (không phải Reload Window) rồi mở lại để PATH được cập nhật.",
+      "Để dùng tmux, hãy tắt terminal hoặc VS Code hiện tại rồi mở lại để PATH được cập nhật.",
     addProjectPrompt: "Thêm project để tạo session agent?",
     addAnotherProject: "Thêm project khác?",
     projectAdded: 'Đã thêm "{name}" → {path}',
