@@ -83,21 +83,24 @@ export function isLinux(): boolean {
   return currentPlatform === Platform.Linux;
 }
 
-export function getMiniAppBaseUrl(): string | null {
+function parseMiniAppBaseUrl(): URL | null {
   const rawValue = process.env[MINI_APP_BASE_URL_ENV]?.trim();
   if (!rawValue) return null;
 
   try {
-    return new URL(rawValue).toString().replace(/\/$/, "");
+    return new URL(rawValue);
   } catch {
     return null;
   }
 }
 
+export function getMiniAppBaseUrl(): string | null {
+  const miniAppUrl = parseMiniAppBaseUrl();
+  return miniAppUrl ? miniAppUrl.toString().replace(/\/$/, "") : null;
+}
+
 export function getMiniAppOrigin(): string | null {
-  const miniAppBaseUrl = getMiniAppBaseUrl();
-  if (!miniAppBaseUrl) return null;
-  return new URL(miniAppBaseUrl).origin;
+  return parseMiniAppBaseUrl()?.origin ?? null;
 }
 
 export function buildMiniAppResponseUrl(
@@ -107,15 +110,16 @@ export function buildMiniAppResponseUrl(
   agent: string
 ): string {
   const miniAppBaseUrl = getMiniAppBaseUrl();
+  const normalizedApiBase = apiBase.replace(/\/+$/, "");
 
   if (!miniAppBaseUrl) {
-    return new URL(`/api/responses/${responseId}`, `${apiBase}/`).toString();
+    return `${normalizedApiBase}/api/responses/${responseId}`;
   }
 
-  const responseUrl = new URL("response/", `${miniAppBaseUrl}/`);
+  const responseUrl = new URL("response/", miniAppBaseUrl);
   responseUrl.search = new URLSearchParams({
     id: responseId,
-    api: apiBase,
+    api: normalizedApiBase,
     p: projectName,
     a: agent,
   }).toString();

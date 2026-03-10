@@ -63,7 +63,7 @@ The response endpoint relies on unguessable IDs and CORS, but it has no rate lim
 
 - Add lightweight rate limiting for `/api/responses/:id`.
 - Log repeated misses or suspicious access patterns at a warning level.
-- Return `Vary: Origin` consistently when CORS is used.
+- Distinguish cache-friendly CORS behavior from rate-limit responses in logs and docs.
 
 **Acceptance criteria**
 

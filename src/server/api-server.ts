@@ -89,11 +89,11 @@ export class ApiServer {
       const tunnelUrl = this.tunnelManager?.getPublicUrl();
       const tunnelOrigin = tunnelUrl ? new URL(tunnelUrl).origin : null;
       const allowedOrigins = new Set(
-        [miniAppOrigin, tunnelOrigin].filter((origin): origin is string => !!origin)
+        [miniAppOrigin, tunnelOrigin].filter((origin): origin is string => origin !== null)
       );
+      res.header("Vary", "Origin");
       if (requestOrigin && allowedOrigins.has(requestOrigin)) {
         res.header("Access-Control-Allow-Origin", requestOrigin);
-        res.header("Vary", "Origin");
       }
       const data = responseStore.get(req.params.id);
       if (!data) {
