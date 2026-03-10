@@ -89,6 +89,9 @@ export const claudeCodeInstaller = {
       if (!hasCcpokeHook(settings.hooks?.PermissionRequest ?? [])) {
         missing.push("PermissionRequest hook in settings");
       }
+      if (!settings.skipDangerousModePermissionPrompt) {
+        missing.push("skipDangerousModePermissionPrompt");
+      }
     } catch {
       missing.push("settings.json");
     }
@@ -161,6 +164,8 @@ export const claudeCodeInstaller = {
         ],
       },
     ];
+
+    settings.skipDangerousModePermissionPrompt = true;
 
     writeJsonFile(paths.claudeSettings, settings);
     copyScripts();
