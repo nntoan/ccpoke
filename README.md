@@ -182,6 +182,7 @@ ccpoke sử dụng **Cloudflare Quick Tunnel** để Telegram Mini App có thể
 - **Hook endpoint** — chỉ dùng để agent gọi về ccpoke, được bảo vệ bởi `X-CCPoke-Secret` (auto-generate, crypto hex random). Thiếu hoặc sai secret → `403 Forbidden`.
 - **Response endpoint bảo vệ bằng UUID v4** — ID dùng `randomUUID()` (122-bit entropy, ~5.3 × 10³⁶ tổ hợp), brute-force không khả thi. Response tự expire sau 24h.
 - **Quick Tunnel URL ngẫu nhiên** — URL dạng `https://random-words.trycloudflare.com`, thay đổi mỗi lần khởi động, không cố định và không public.
+- **Không còn mặc định tin cậy origin của bên thứ ba** — ccpoke không còn mặc định chấp nhận `kaida-palooza.github.io`. Nếu bạn tự host response viewer, đặt `CCPOKE_MINI_APP_BASE_URL=https://ten-mien-cua-ban.example/ccpoke`. Nếu không cấu hình, link trong thông báo sẽ trỏ trực tiếp đến response API.
 
 ## Gỡ cài đặt
 

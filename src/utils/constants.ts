@@ -50,8 +50,8 @@ export const ApiRoute = {
 } as const;
 
 export const DEFAULT_HOOK_PORT = 9377;
-export const MINI_APP_BASE_URL = "https://kaida-palooza.github.io/ccpoke";
 export const CCPOKE_MARKER = "ccpoke";
+export const MINI_APP_BASE_URL_ENV = "CCPOKE_MINI_APP_BASE_URL";
 
 export const ChannelName = {
   Telegram: "telegram",
@@ -81,6 +81,45 @@ export function isMacOS(): boolean {
 
 export function isLinux(): boolean {
   return currentPlatform === Platform.Linux;
+}
+
+export function getMiniAppBaseUrl(): string | null {
+  const rawValue = process.env[MINI_APP_BASE_URL_ENV]?.trim();
+  if (!rawValue) return null;
+
+  try {
+    return new URL(rawValue).toString().replace(/\/$/, "");
+  } catch {
+    return null;
+  }
+}
+
+export function getMiniAppOrigin(): string | null {
+  const miniAppBaseUrl = getMiniAppBaseUrl();
+  if (!miniAppBaseUrl) return null;
+  return new URL(miniAppBaseUrl).origin;
+}
+
+export function buildMiniAppResponseUrl(
+  apiBase: string,
+  responseId: string,
+  projectName: string,
+  agent: string
+): string {
+  const miniAppBaseUrl = getMiniAppBaseUrl();
+
+  if (!miniAppBaseUrl) {
+    return new URL(`/api/responses/${responseId}`, `${apiBase}/`).toString();
+  }
+
+  const responseUrl = new URL("response/", `${miniAppBaseUrl}/`);
+  responseUrl.search = new URLSearchParams({
+    id: responseId,
+    api: apiBase,
+    p: projectName,
+    a: agent,
+  }).toString();
+  return responseUrl.toString();
 }
 
 export function refreshWindowsPath(): void {

@@ -5,12 +5,10 @@ import express, { type Express } from "express";
 import { AgentHandler } from "../agent/agent-handler.js";
 import { AgentName } from "../agent/types.js";
 import { t } from "../i18n/index.js";
-import { ApiRoute, isWindows, MINI_APP_BASE_URL } from "../utils/constants.js";
+import { ApiRoute, getMiniAppOrigin, isWindows } from "../utils/constants.js";
 import { log, logDebug, logError } from "../utils/log.js";
 import { responseStore } from "../utils/response-store.js";
 import type { TunnelManager } from "../utils/tunnel.js";
-
-const ALLOWED_CORS_ORIGIN = new URL(MINI_APP_BASE_URL).origin;
 
 export class ApiServer {
   private app: Express;
@@ -87,15 +85,16 @@ export class ApiServer {
         `[API] GET ${ApiRoute.ResponseData} id=${req.params.id} origin=${req.headers.origin ?? "none"}`
       );
       const requestOrigin = req.headers.origin ?? "";
+      const miniAppOrigin = getMiniAppOrigin();
       const tunnelUrl = this.tunnelManager?.getPublicUrl();
       const tunnelOrigin = tunnelUrl ? new URL(tunnelUrl).origin : null;
-      const allowedOrigin =
-        requestOrigin === ALLOWED_CORS_ORIGIN
-          ? ALLOWED_CORS_ORIGIN
-          : tunnelOrigin && requestOrigin === tunnelOrigin
-            ? tunnelOrigin
-            : ALLOWED_CORS_ORIGIN;
-      res.header("Access-Control-Allow-Origin", allowedOrigin);
+      const allowedOrigins = new Set(
+        [miniAppOrigin, tunnelOrigin].filter((origin): origin is string => !!origin)
+      );
+      if (requestOrigin && allowedOrigins.has(requestOrigin)) {
+        res.header("Access-Control-Allow-Origin", requestOrigin);
+        res.header("Vary", "Origin");
+      }
       const data = responseStore.get(req.params.id);
       if (!data) {
         res.status(404).json({ error: "not_found" });

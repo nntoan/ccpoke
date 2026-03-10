@@ -1,6 +1,6 @@
 import type { NotificationChannel, NotificationData } from "../channel/types.js";
 import { t } from "../i18n/index.js";
-import { MINI_APP_BASE_URL } from "../utils/constants.js";
+import { buildMiniAppResponseUrl } from "../utils/constants.js";
 import { log, logDebug, logError } from "../utils/log.js";
 import { responseStore } from "../utils/response-store.js";
 import type { TunnelManager } from "../utils/tunnel.js";
@@ -211,13 +211,7 @@ export class AgentHandler {
     const id = responseStore.save(data);
 
     const apiBase = this.tunnelManager.getPublicUrl() || `http://localhost:${this.hookPort}`;
-    const params = new URLSearchParams({
-      id,
-      api: apiBase,
-      p: data.projectName,
-      a: data.agent,
-    });
-    return `${MINI_APP_BASE_URL}/response/?${params.toString()}`;
+    return buildMiniAppResponseUrl(apiBase, id, data.projectName, data.agent);
   }
 
   private parseAskUserQuestionEvent(raw: unknown): AskUserQuestionEvent | null {
