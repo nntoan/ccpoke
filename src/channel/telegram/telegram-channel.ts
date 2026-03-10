@@ -772,6 +772,12 @@ export class TelegramChannel implements NotificationChannel {
   }
 
   private patchProcessUpdate(): void {
+    const originalGetUpdates = this.bot.getUpdates.bind(this.bot);
+    this.bot.getUpdates = (...args: Parameters<typeof this.bot.getUpdates>) => {
+      this.lastPollingActivity = Date.now();
+      return originalGetUpdates(...args);
+    };
+
     const original = this.bot.processUpdate.bind(this.bot);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.bot.processUpdate = (update: any) => {
@@ -821,11 +827,12 @@ export class TelegramChannel implements NotificationChannel {
     const DISCONNECT_THRESHOLD = 3;
 
     this.bot.on("polling_error", (err: unknown) => {
-      this.lastPollingActivity = Date.now();
       this.consecutivePollingErrors++;
 
-      const errMsg = err instanceof Error ? err.message : String(err ?? "unknown");
-      logDebug(`[Polling] error #${this.consecutivePollingErrors}: ${errMsg}`);
+      if (this.consecutivePollingErrors <= DISCONNECT_THRESHOLD) {
+        const errMsg = err instanceof Error ? err.message : String(err ?? "unknown");
+        logDebug(`[Polling] error #${this.consecutivePollingErrors}: ${errMsg}`);
+      }
 
       if (!this.isDisconnected && this.consecutivePollingErrors >= DISCONNECT_THRESHOLD) {
         this.isDisconnected = true;
@@ -854,6 +861,7 @@ export class TelegramChannel implements NotificationChannel {
           // already stopped
         }
         this.bot.startPolling();
+        this.lastPollingActivity = Date.now();
         this.reconnectTimer = null;
         log(t("bot.pollingRestarted"));
       }, RESTART_DELAY_MS);
