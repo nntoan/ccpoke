@@ -197,6 +197,7 @@ Một số điểm cần lưu ý:
 - **Response endpoint bảo vệ bằng UUID v4** — ID dùng `randomUUID()` (122-bit entropy, ~5.3 × 10³⁶ tổ hợp), brute-force không khả thi. Response tự expire sau 24h.
 - **Quick Tunnel URL ngẫu nhiên** — URL dạng `https://random-words.trycloudflare.com`, thay đổi mỗi lần khởi động, không cố định và không public.
 - **Không còn mặc định tin cậy origin của bên thứ ba** — ccpoke không còn mặc định chấp nhận `kaida-palooza.github.io`. Nếu bạn tự host response viewer, đặt `CCPOKE_MINI_APP_BASE_URL=https://ten-mien-cua-ban.example/ccpoke`.
+- **Không có tunnel thì không có link xem từ xa** — khi không có public tunnel URL, ccpoke sẽ bỏ nút "View Details" thay vì gửi một địa chỉ localhost không dùng được trên thiết bị khác.
 - **Khuyến nghị mặc định** — giữ tunnel tắt nếu bạn không cần xem response từ xa. Chat app đã kết nối trực tiếp tới ccpoke; không cần Cloudflare để gửi tin nhắn hay điều khiển Claude Code / OpenCode / Codex.
 
 ## Gỡ cài đặt

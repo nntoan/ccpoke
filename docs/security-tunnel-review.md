@@ -91,11 +91,11 @@ The response endpoint relies on unguessable IDs and CORS, but it has no rate lim
 
 **Why**
 
-Cloudflare Quick Tunnel is convenient, but some users want to avoid third-party tunnel routing entirely or use infrastructure they already control.
+Cloudflare Quick Tunnel is now opt-in, but some users still want more than a simple on/off switch. They may want to use infrastructure they already control or publish a stable public API URL without Cloudflare Quick Tunnel.
 
 **Scope**
 
-- Allow users to disable auto-started Quick Tunnel cleanly.
+- Add first-class config for a custom public API base URL.
 - Support an explicit public API base URL for trusted reverse proxies or managed tunnels.
 - Reuse the same origin validation logic for that public URL.
 

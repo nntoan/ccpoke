@@ -197,6 +197,7 @@ Key security notes:
 - **Response endpoint protected by UUID v4** — IDs use `randomUUID()` (122-bit entropy, ~5.3 × 10³⁶ combinations), brute-force is infeasible. Responses auto-expire after 24h.
 - **Quick Tunnel URL is random** — format `https://random-words.trycloudflare.com`, changes on every restart, not fixed or publicly listed.
 - **No implicit third-party mini app origin** — ccpoke no longer trusts `kaida-palooza.github.io` by default. If you host your own response viewer, set `CCPOKE_MINI_APP_BASE_URL=https://your-domain.example/ccpoke`.
+- **No tunnel, no remote viewer link** — when no public tunnel URL exists, ccpoke omits the "View Details" link instead of sending users to an unusable localhost address.
 - **Recommended default** — keep the tunnel off unless you explicitly need remote response viewing. Chat apps already connect directly to ccpoke; they do not need Cloudflare to send messages or control Claude Code / OpenCode / Codex sessions.
 
 ## Uninstall
