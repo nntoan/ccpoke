@@ -176,7 +176,7 @@ Handles config persistence and schema migrations.
 | **install-detection.ts** | - | Detects installed agents (Claude Code, Cursor, Codex) |
 | **shell-completion.ts** | - | zsh/bash tab completion generation |
 | **path-prompt.ts** | - | Interactive path input with tab completion |
-| **log.ts** | - | Structured logging (debug, info, warn, error) |
+| **log.ts** | 64 | Pino v10 logger wrapper (async file + pretty console, rotates at 2MB) |
 
 ### Entry Point (`src/index.ts`)
 
