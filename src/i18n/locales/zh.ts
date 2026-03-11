@@ -184,6 +184,8 @@ export const zh: TranslationKeys = {
     installing: "正在安装 cloudflared 二进制文件...",
     installed: "cloudflared 二进制文件已安装",
     started: "🌐 公共 URL: {url}",
+    disabled:
+      "Cloudflare Quick Tunnel 默认关闭；核心机器人/聊天功能仍可用，但远程响应查看链接仅在设置 CCPOKE_ENABLE_TUNNEL=1 时启用",
     failed: "隧道失败，仅使用 localhost",
     disconnected: "隧道断开连接，正在重新连接...",
     exited: "隧道进程已退出 (代码 {code})",

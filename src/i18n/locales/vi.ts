@@ -187,6 +187,8 @@ export const vi: TranslationKeys = {
     installing: "đang cài đặt cloudflared binary...",
     installed: "đã cài đặt cloudflared binary",
     started: "🌐 URL công khai: {url}",
+    disabled:
+      "Cloudflare Quick Tunnel mặc định bị tắt; bot/chat vẫn hoạt động, nhưng link xem response từ xa chỉ bật khi CCPOKE_ENABLE_TUNNEL=1",
     failed: "tunnel thất bại, chỉ dùng localhost",
     disconnected: "tunnel bị ngắt, đang kết nối lại...",
     exited: "tunnel process đã thoát (code {code})",

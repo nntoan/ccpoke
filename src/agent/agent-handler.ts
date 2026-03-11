@@ -207,10 +207,11 @@ export class AgentHandler {
     this.onNotification?.({ ...event, sessionId });
   }
 
-  private buildResponseUrl(data: NotificationData): string {
-    const id = responseStore.save(data);
+  private buildResponseUrl(data: NotificationData): string | undefined {
+    const apiBase = this.tunnelManager.getPublicUrl();
+    if (!apiBase) return undefined;
 
-    const apiBase = this.tunnelManager.getPublicUrl() || `http://localhost:${this.hookPort}`;
+    const id = responseStore.save(data);
     return buildMiniAppResponseUrl(apiBase, id, data.projectName, data.agent);
   }
 

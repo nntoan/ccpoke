@@ -21,7 +21,13 @@ import { SessionMap } from "./tmux/session-map.js";
 import { SessionStateManager } from "./tmux/session-state.js";
 import { TmuxBridge } from "./tmux/tmux-bridge.js";
 import { TmuxSessionResolver } from "./tmux/tmux-session-resolver.js";
-import { ChannelName, CliCommand, InstallMethod, refreshWindowsPath } from "./utils/constants.js";
+import {
+  ChannelName,
+  CliCommand,
+  InstallMethod,
+  isTunnelEnabled,
+  refreshWindowsPath,
+} from "./utils/constants.js";
 import { detectInstallMethod } from "./utils/install-detection.js";
 import { log, logError, logWarn } from "./utils/log.js";
 import { ensureShellCompletion } from "./utils/shell-completion.js";
@@ -132,11 +138,15 @@ async function startBot(): Promise<void> {
 
   const tunnelManager = new TunnelManager();
   apiServer.setTunnelManager(tunnelManager);
-  try {
-    const tunnelUrl = await tunnelManager.start(cfg.hook_port);
-    log(t("tunnel.started", { url: tunnelUrl }));
-  } catch (err: unknown) {
-    logError(t("tunnel.failed"), err);
+  if (isTunnelEnabled()) {
+    try {
+      const tunnelUrl = await tunnelManager.start(cfg.hook_port);
+      log(t("tunnel.started", { url: tunnelUrl }));
+    } catch (err: unknown) {
+      logError(t("tunnel.failed"), err);
+    }
+  } else {
+    log(t("tunnel.disabled"));
   }
 
   let channel: NotificationChannel;

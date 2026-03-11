@@ -8,7 +8,23 @@
 - Only allow browser CORS access from:
   - the active tunnel origin, or
   - a self-hosted mini app origin configured through `CCPOKE_MINI_APP_BASE_URL`.
-- When no mini app is configured, notification links fall back to the direct response API URL instead of routing users through a third-party hosted viewer.
+- Keep Cloudflare Quick Tunnel optional and disabled by default.
+- Keep notification/chat control working without any public tunnel.
+- Only attach response-view links when a public tunnel URL actually exists.
+
+## Recommendation
+
+For this project, Cloudflare Quick Tunnel is a convenience feature, not a core requirement.
+
+- **Good fit for:** remote "View Details" links, quick demos, and temporary remote access without deploying infrastructure.
+- **Not needed for:** Telegram/Discord/Slack messaging, two-way chat, permission handling, or direct control of Claude Code / OpenCode / Codex sessions.
+- **Security trade-off:** when enabled, the tunnel exposes the local HTTP server to the internet through a random Cloudflare URL. That includes `/api/responses/:id`, `/hook/*`, and `/health`.
+
+Recommended default:
+
+1. Keep tunnel **off** for normal bot/chat usage.
+2. Turn it **on explicitly** only when remote response viewing is needed.
+3. Prefer a self-hosted reverse proxy or managed tunnel later if stable public access becomes a product requirement.
 
 ### Remaining follow-up work
 
@@ -87,4 +103,4 @@ Cloudflare Quick Tunnel is convenient, but some users want to avoid third-party 
 
 - Users can run ccpoke behind their own tunnel or proxy without patching code.
 - Response links, CORS, and bot messages use the configured public endpoint.
-- Quick Tunnel remains the default only when no explicit public endpoint is configured.
+- Quick Tunnel remains opt-in, and a custom public endpoint can replace it cleanly.

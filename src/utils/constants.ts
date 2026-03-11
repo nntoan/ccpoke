@@ -52,6 +52,7 @@ export const ApiRoute = {
 export const DEFAULT_HOOK_PORT = 9377;
 export const CCPOKE_MARKER = "ccpoke";
 export const MINI_APP_BASE_URL_ENV = "CCPOKE_MINI_APP_BASE_URL";
+export const ENABLE_TUNNEL_ENV = "CCPOKE_ENABLE_TUNNEL";
 
 export const ChannelName = {
   Telegram: "telegram",
@@ -101,6 +102,11 @@ export function getMiniAppBaseUrl(): string | null {
 
 export function getMiniAppOrigin(): string | null {
   return parseMiniAppBaseUrl()?.origin ?? null;
+}
+
+export function isTunnelEnabled(): boolean {
+  const rawValue = process.env[ENABLE_TUNNEL_ENV]?.trim().toLowerCase();
+  return rawValue === "1" || rawValue === "true" || rawValue === "yes";
 }
 
 export function buildMiniAppResponseUrl(

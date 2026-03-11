@@ -172,6 +172,7 @@ export interface TranslationKeys {
     installing: string;
     installed: string;
     started: string;
+    disabled: string;
     failed: string;
     disconnected: string;
     exited: string;

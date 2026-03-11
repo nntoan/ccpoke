@@ -177,12 +177,27 @@ Fixed authentication bug in login.go. Main changes:
 
 ## Security & Tunnel
 
-ccpoke uses **Cloudflare Quick Tunnel** so the Telegram Mini App can view agent responses. Key security notes:
+ccpoke keeps **Cloudflare Quick Tunnel optional and off by default**. Telegram, Discord, and Slack already communicate with ccpoke over outbound connections, so core notifications, two-way chat, permission prompts, and session control do **not** require opening inbound internet access.
+
+Enable the tunnel only when you want remote "View Details" links:
+
+```bash
+CCPOKE_ENABLE_TUNNEL=1 ccpoke
+```
+
+When enabled, the tunnel exposes the local HTTP server to the internet through a random Cloudflare URL. That means these routes become reachable from the public internet:
+
+- `GET /api/responses/:id` — response viewer data, protected by unguessable UUIDs and CORS
+- `POST /hook/*` — agent hook endpoints, protected by `X-CCPoke-Secret`
+- `GET /health` — unauthenticated health check
+
+Key security notes:
 
 - **Hook endpoint** — only used by agents calling back to ccpoke, protected by `X-CCPoke-Secret` (auto-generated, crypto hex random). Missing or wrong secret → `403 Forbidden`.
 - **Response endpoint protected by UUID v4** — IDs use `randomUUID()` (122-bit entropy, ~5.3 × 10³⁶ combinations), brute-force is infeasible. Responses auto-expire after 24h.
 - **Quick Tunnel URL is random** — format `https://random-words.trycloudflare.com`, changes on every restart, not fixed or publicly listed.
-- **No implicit third-party mini app origin** — ccpoke no longer trusts `kaida-palooza.github.io` by default. If you host your own response viewer, set `CCPOKE_MINI_APP_BASE_URL=https://your-domain.example/ccpoke`. Otherwise notification links fall back to the direct response API URL.
+- **No implicit third-party mini app origin** — ccpoke no longer trusts `kaida-palooza.github.io` by default. If you host your own response viewer, set `CCPOKE_MINI_APP_BASE_URL=https://your-domain.example/ccpoke`.
+- **Recommended default** — keep the tunnel off unless you explicitly need remote response viewing. Chat apps already connect directly to ccpoke; they do not need Cloudflare to send messages or control Claude Code / OpenCode / Codex sessions.
 
 ## Uninstall
 

@@ -177,12 +177,27 @@ Gửi `/projects` trên Telegram → chọn dự án → chọn agent (Claude Co
 
 ## Bảo mật & Tunnel
 
-ccpoke sử dụng **Cloudflare Quick Tunnel** để Telegram Mini App có thể xem response từ agent. Một số điểm cần lưu ý:
+ccpoke để **Cloudflare Quick Tunnel ở trạng thái tùy chọn và mặc định tắt**. Telegram, Discord và Slack đã giao tiếp với ccpoke bằng kết nối outbound, nên notification, chat 2 chiều, permission prompt và điều khiển session **không cần** mở inbound từ internet.
+
+Chỉ bật tunnel khi bạn thực sự cần link "View Details" từ xa:
+
+```bash
+CCPOKE_ENABLE_TUNNEL=1 ccpoke
+```
+
+Khi bật, tunnel sẽ đưa HTTP server cục bộ ra internet thông qua một URL Cloudflare ngẫu nhiên. Nghĩa là các route sau sẽ có thể truy cập từ internet:
+
+- `GET /api/responses/:id` — dữ liệu response viewer, bảo vệ bằng UUID khó đoán và CORS
+- `POST /hook/*` — các hook endpoint của agent, bảo vệ bằng `X-CCPoke-Secret`
+- `GET /health` — health check không yêu cầu xác thực
+
+Một số điểm cần lưu ý:
 
 - **Hook endpoint** — chỉ dùng để agent gọi về ccpoke, được bảo vệ bởi `X-CCPoke-Secret` (auto-generate, crypto hex random). Thiếu hoặc sai secret → `403 Forbidden`.
 - **Response endpoint bảo vệ bằng UUID v4** — ID dùng `randomUUID()` (122-bit entropy, ~5.3 × 10³⁶ tổ hợp), brute-force không khả thi. Response tự expire sau 24h.
 - **Quick Tunnel URL ngẫu nhiên** — URL dạng `https://random-words.trycloudflare.com`, thay đổi mỗi lần khởi động, không cố định và không public.
-- **Không còn mặc định tin cậy origin của bên thứ ba** — ccpoke không còn mặc định chấp nhận `kaida-palooza.github.io`. Nếu bạn tự host response viewer, đặt `CCPOKE_MINI_APP_BASE_URL=https://ten-mien-cua-ban.example/ccpoke`. Nếu không cấu hình, link trong thông báo sẽ trỏ trực tiếp đến response API.
+- **Không còn mặc định tin cậy origin của bên thứ ba** — ccpoke không còn mặc định chấp nhận `kaida-palooza.github.io`. Nếu bạn tự host response viewer, đặt `CCPOKE_MINI_APP_BASE_URL=https://ten-mien-cua-ban.example/ccpoke`.
+- **Khuyến nghị mặc định** — giữ tunnel tắt nếu bạn không cần xem response từ xa. Chat app đã kết nối trực tiếp tới ccpoke; không cần Cloudflare để gửi tin nhắn hay điều khiển Claude Code / OpenCode / Codex.
 
 ## Gỡ cài đặt
 

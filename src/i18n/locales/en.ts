@@ -187,6 +187,8 @@ export const en: TranslationKeys = {
     installing: "installing cloudflared binary...",
     installed: "cloudflared binary installed",
     started: "🌐 public URL: {url}",
+    disabled:
+      "Cloudflare Quick Tunnel is disabled by default; core bot/chat features still work, but remote response-view links stay off unless CCPOKE_ENABLE_TUNNEL=1",
     failed: "tunnel failed, using localhost only",
     disconnected: "tunnel disconnected, reconnecting...",
     exited: "tunnel process exited (code {code})",
