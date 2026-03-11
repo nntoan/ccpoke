@@ -1,4 +1,16 @@
+import { execSync } from "node:child_process";
+
 import { isWindows } from "./constants.js";
+
+export function isCommandAvailable(command: string): boolean {
+  const checker = isWindows() ? "where" : "which";
+  try {
+    execSync(`${checker} ${command}`, { stdio: "pipe", timeout: 3000 });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function escapeShellArg(arg: string): string {
   if (isWindows()) {

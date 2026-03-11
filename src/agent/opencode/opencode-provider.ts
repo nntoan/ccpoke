@@ -1,8 +1,10 @@
 import { existsSync } from "node:fs";
 
+import { AGENT_START_COMMANDS } from "../../channel/agent-launcher.js";
 import { collectGitChanges } from "../../utils/git-collector.js";
 import { logger } from "../../utils/log.js";
 import { paths } from "../../utils/paths.js";
+import { isCommandAvailable } from "../../utils/shell.js";
 import {
   AGENT_DISPLAY_NAMES,
   AgentName,
@@ -19,7 +21,11 @@ export class OpencodeProvider implements AgentProvider {
   readonly submitKeys = ["Enter"];
 
   detect(): boolean {
-    return existsSync(paths.opencodeDir);
+    if (!existsSync(paths.opencodeDir)) return false;
+    const startCommand = AGENT_START_COMMANDS[AgentName.OpenCode];
+    if (!startCommand) return false;
+    const binary = startCommand.split(" ")[0]!;
+    return isCommandAvailable(binary);
   }
 
   isHookInstalled(): boolean {

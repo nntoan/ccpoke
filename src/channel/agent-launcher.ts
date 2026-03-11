@@ -4,23 +4,35 @@ import { AgentName } from "../agent/types.js";
 import { getTmuxBinary, type TmuxBridge } from "../tmux/tmux-bridge.js";
 import { isWindows } from "../utils/constants.js";
 import { logger } from "../utils/log.js";
-import { escapeShellArg } from "../utils/shell.js";
+import { escapeShellArg, isCommandAvailable } from "../utils/shell.js";
 
-const AGENT_START_COMMANDS: Record<string, string> = {
+export const AGENT_START_COMMANDS: Record<string, string> = {
   [AgentName.ClaudeCode]: "claude --dangerously-skip-permissions",
-  [AgentName.Cursor]: "cursor agent --force",
+  [AgentName.Cursor]: "agent --force",
   [AgentName.Codex]: "codex --full-auto",
   [AgentName.GeminiCli]: "gemini --yolo",
   [AgentName.OpenCode]: "opencode",
 };
+
+function validateCliAvailable(agentKey: string): void {
+  const startCommand = AGENT_START_COMMANDS[agentKey];
+  if (!startCommand) {
+    throw new Error(`Unknown agent: ${agentKey}`);
+  }
+
+  const binary = startCommand.split(" ")[0]!;
+  if (!isCommandAvailable(binary)) {
+    throw new Error(`${binary} not found in PATH`);
+  }
+}
 
 export function launchAgent(
   tmuxBridge: TmuxBridge,
   projectPath: string,
   agentKey: string
 ): { paneTarget: string; needsTrust: boolean } {
-  const startCommand =
-    AGENT_START_COMMANDS[agentKey] ?? AGENT_START_COMMANDS[AgentName.ClaudeCode]!;
+  validateCliAvailable(agentKey);
+  const startCommand = AGENT_START_COMMANDS[agentKey]!;
   const tmuxSession = getTmuxSessionName();
   const paneTarget = tmuxBridge.createPane(tmuxSession, projectPath);
   tmuxBridge.sendKeys(paneTarget, startCommand, ["Enter"]);
