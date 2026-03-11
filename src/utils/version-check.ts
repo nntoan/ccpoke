@@ -154,6 +154,7 @@ function respawnSelf(): Promise<never> {
   });
 
   const forward = (signal: NodeJS.Signals) => child.kill(signal);
+  process.on("SIGINT", forward);
   process.on("SIGTERM", forward);
   process.on("SIGHUP", forward);
 
