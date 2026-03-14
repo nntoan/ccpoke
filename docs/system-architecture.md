@@ -598,10 +598,13 @@ index.ts (Entry Point)
 ```
 ~/.ccpoke/
 ├── config.json           # User configuration
+│   ├─ channel (telegram|discord|slack)
 │   ├─ telegram_bot_token
 │   ├─ user_id
 │   ├─ hook_port (default: 9377)
 │   ├─ hook_secret
+│   ├─ tunnel (cloudflare|ngrok|https://...|false)
+│   ├─ ngrok_authtoken (optional, for ngrok provider)
 │   ├─ agents: ["claude-code", "cursor", "codex", "gemini-cli"]
 │   └─ projects: {...}
 │
@@ -706,11 +709,24 @@ server.listen(9377, '127.0.0.1', () => {
 - ✅ Local machine: `curl http://127.0.0.1:9377/`
 - ❌ Remote: `curl http://your-machine:9377/` — fails
 
-**Tunnel (Optional):**
-Users can optionally expose via Cloudflare Tunnel:
-```bash
-cloudflared tunnel run
+**Tunnel Provider (Optional):**
+
+The bot can expose its hook endpoint via tunnel provider, selectable during setup:
+
+- **cloudflare** (default) — Cloudflare Tunnel with auto-restart on failure
+- **ngrok** — ngrok tunnel with retry logic (requires `ngrok_authtoken`)
+- **custom URL** — User-provided HTTPS endpoint (e.g., custom reverse proxy)
+- **disabled** (false) — Localhost only, no tunnel
+
+**Configuration:**
+```json
+{
+  "tunnel": "cloudflare",
+  "ngrok_authtoken": ""  // Only for ngrok provider
+}
 ```
+
+Each provider implements `TunnelProvider` interface: `start(port)`, `stop()`, `getPublicUrl()`.
 
 ---
 

@@ -172,7 +172,12 @@ Handles config persistence and schema migrations.
 | **markdown.ts** | - | Markdown to Telegram MarkdownV2 conversion |
 | **response-store.ts** | - | Stores responses by session ID (24h TTL, max 100) |
 | **stats-format.ts** | - | Formats execution stats (duration, tokens) |
-| **tunnel.ts** | - | Cloudflare tunnel integration with retry logic and auto-restart |
+| **tunnel.ts** | - | Tunnel manager (retry logic, auto-restart on process exit) |
+| **tunnel-types.ts** | - | `TunnelType`, `TunnelProvider` interface, retry constants |
+| **tunnel-provider-factory.ts** | - | Factory for creating tunnel provider instances |
+| **tunnel-providers/cloudflare-tunnel-provider.ts** | - | Cloudflare Tunnel implementation |
+| **tunnel-providers/ngrok-tunnel-provider.ts** | - | ngrok Tunnel implementation (requires authtoken) |
+| **tunnel-providers/custom-url-tunnel-provider.ts** | - | Custom HTTPS URL provider (passthrough) |
 | **version-check.ts** | - | npm version checking |
 | **install-detection.ts** | - | Detects installed agents (Claude Code, Cursor, Codex) |
 | **shell-completion.ts** | - | zsh/bash tab completion generation |
