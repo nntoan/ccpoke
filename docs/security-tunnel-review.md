@@ -20,6 +20,13 @@ For this project, Cloudflare Quick Tunnel is a convenience feature, not a core r
 - **Not needed for:** Telegram/Discord/Slack messaging, two-way chat, permission handling, or direct control of Claude Code / OpenCode / Codex sessions.
 - **Security trade-off:** when enabled, the tunnel exposes the local HTTP server to the internet through a random Cloudflare URL. That includes `/api/responses/:id`, `/hook/*`, and `/health`.
 
+Why the chat bots still work with the tunnel disabled:
+
+- Telegram uses outbound polling to the Telegram Bot API.
+- Discord uses an outbound gateway connection plus outbound DM sends.
+- Slack uses outbound Web API calls.
+- In the current runtime, `TunnelManager` is only consulted for optional response-view links and response-viewer CORS, not for chat delivery or bot initialization.
+
 Recommended default:
 
 1. Keep tunnel **off** for normal bot/chat usage.

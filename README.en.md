@@ -179,6 +179,13 @@ Fixed authentication bug in login.go. Main changes:
 
 ccpoke keeps **Cloudflare Quick Tunnel optional and off by default**. Telegram, Discord, and Slack already communicate with ccpoke over outbound connections, so core notifications, two-way chat, permission prompts, and session control do **not** require opening inbound internet access.
 
+Why chat bots still work without the tunnel:
+
+- **Telegram** uses the bot API over outbound polling from the local ccpoke process.
+- **Discord** connects outbound to the Discord gateway and DMs from the local ccpoke process.
+- **Slack** sends outbound Web API requests from the local ccpoke process.
+- **TunnelManager is only used for public response links and response-viewer CORS**, not for bot startup or chat delivery.
+
 Enable the tunnel only when you want remote "View Details" links:
 
 ```bash

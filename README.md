@@ -179,6 +179,13 @@ Gửi `/projects` trên Telegram → chọn dự án → chọn agent (Claude Co
 
 ccpoke để **Cloudflare Quick Tunnel ở trạng thái tùy chọn và mặc định tắt**. Telegram, Discord và Slack đã giao tiếp với ccpoke bằng kết nối outbound, nên notification, chat 2 chiều, permission prompt và điều khiển session **không cần** mở inbound từ internet.
 
+Lý do chat bot vẫn hoạt động khi tắt tunnel:
+
+- **Telegram** dùng bot API theo cơ chế outbound polling từ tiến trình ccpoke trên máy local.
+- **Discord** kết nối outbound tới Discord gateway và gửi DM từ tiến trình ccpoke trên máy local.
+- **Slack** gửi các yêu cầu outbound tới Web API từ tiến trình ccpoke trên máy local.
+- **TunnelManager chỉ được dùng cho link response công khai và CORS của response viewer**, không tham gia vào quá trình khởi động bot hay gửi/nhận chat.
+
 Chỉ bật tunnel khi bạn thực sự cần link "View Details" từ xa:
 
 ```bash
