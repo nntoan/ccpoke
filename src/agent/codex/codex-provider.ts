@@ -62,7 +62,7 @@ export class CodexProvider implements AgentProvider {
 
     const gitChanges = event.cwd ? collectGitChanges(event.cwd) : [];
     const obj = raw as Record<string, unknown>;
-    const tmuxTarget = typeof obj.tmux_target === "string" ? obj.tmux_target : undefined;
+    const paneId = typeof obj.pane_id === "string" ? obj.pane_id : undefined;
 
     return {
       projectName: extractProjectName(event.cwd),
@@ -71,14 +71,14 @@ export class CodexProvider implements AgentProvider {
       model: rollout.model,
       agentSessionId: event.threadId || undefined,
       cwd: event.cwd,
-      tmuxTarget,
+      paneId,
     };
   }
 
   private createFallbackResult(raw: unknown): AgentEventResult {
     const obj = (typeof raw === "object" && raw !== null ? raw : {}) as Record<string, unknown>;
     const cwd = typeof obj.cwd === "string" ? obj.cwd : "";
-    const tmuxTarget = typeof obj.tmux_target === "string" ? obj.tmux_target : undefined;
+    const paneId = typeof obj.pane_id === "string" ? obj.pane_id : undefined;
 
     return {
       projectName: cwd ? extractProjectName(cwd) : "unknown",
@@ -86,7 +86,7 @@ export class CodexProvider implements AgentProvider {
       gitChanges: cwd ? collectGitChanges(cwd) : [],
       model: "",
       cwd,
-      tmuxTarget,
+      paneId,
     };
   }
 }

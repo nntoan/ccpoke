@@ -60,7 +60,7 @@ export class ClaudeCodeProvider implements AgentProvider {
     }
 
     const gitChanges = collectGitChanges(raw.cwd);
-    const tmuxTarget = typeof obj.tmux_target === "string" ? obj.tmux_target : undefined;
+    const paneId = typeof obj.pane_id === "string" ? obj.pane_id : undefined;
 
     return {
       projectName: extractProjectName(raw.cwd, raw.transcript_path),
@@ -69,7 +69,7 @@ export class ClaudeCodeProvider implements AgentProvider {
       model: transcriptModel,
       agentSessionId: raw.session_id,
       cwd: raw.cwd,
-      tmuxTarget,
+      paneId,
     };
   }
 
@@ -77,7 +77,7 @@ export class ClaudeCodeProvider implements AgentProvider {
     const obj = (typeof raw === "object" && raw !== null ? raw : {}) as Record<string, unknown>;
     const cwd = typeof obj.cwd === "string" ? obj.cwd : "";
     const transcriptPath = typeof obj.transcript_path === "string" ? obj.transcript_path : "";
-    const tmuxTarget = typeof obj.tmux_target === "string" ? obj.tmux_target : undefined;
+    const paneId = typeof obj.pane_id === "string" ? obj.pane_id : undefined;
 
     const bodyMessage =
       typeof obj.last_assistant_message === "string" ? obj.last_assistant_message : "";
@@ -89,7 +89,7 @@ export class ClaudeCodeProvider implements AgentProvider {
       model: "",
       agentSessionId: typeof obj.session_id === "string" ? obj.session_id : undefined,
       cwd,
-      tmuxTarget,
+      paneId,
     };
   }
 }

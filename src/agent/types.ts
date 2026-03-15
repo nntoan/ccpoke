@@ -50,5 +50,5 @@ export interface AgentEventResult {
   model: string;
   agentSessionId?: string;
   cwd?: string;
-  tmuxTarget?: string;
+  paneId?: string;
 }

@@ -1,21 +1,22 @@
 import type { NotificationChannel, NotificationData } from "../channel/types.js";
 import { t } from "../i18n/index.js";
+import { queryPanePid } from "../tmux/tmux-scanner.js";
 import type { TunnelManager } from "../tunnel/tunnel-manager.js";
 import { MINI_APP_BASE_URL } from "../utils/constants.js";
 import { logger } from "../utils/log.js";
 import { responseStore } from "../utils/response-store.js";
 import type { AgentRegistry } from "./agent-registry.js";
-import type { ChatSessionResolver } from "./chat-session-resolver.js";
+import type { ChatPaneResolver } from "./chat-pane-resolver.js";
 
-const TMUX_TARGET_REGEX = /^[a-zA-Z0-9_.:/@ -]+$/;
-function validateTmuxTarget(value: unknown): string | undefined {
+const PANE_ID_REGEX = /^%\d+$/;
+function validatePaneId(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
-  return TMUX_TARGET_REGEX.test(value) ? value : undefined;
+  return PANE_ID_REGEX.test(value) ? value : undefined;
 }
 
 export interface NotificationEvent {
   sessionId: string;
-  tmuxTarget?: string;
+  paneId?: string;
   notificationType: string;
   message: string;
   title?: string;
@@ -36,7 +37,7 @@ export interface AskUserQuestionItem {
 
 export interface AskUserQuestionEvent {
   sessionId: string;
-  tmuxTarget?: string;
+  paneId?: string;
   cwd?: string;
   agent?: string;
   questions: AskUserQuestionItem[];
@@ -44,7 +45,7 @@ export interface AskUserQuestionEvent {
 
 export interface PermissionRequestEvent {
   sessionId: string;
-  tmuxTarget?: string;
+  paneId?: string;
   cwd?: string;
   toolName: string;
   toolInput: Record<string, unknown>;
@@ -57,7 +58,7 @@ export class AgentHandler {
     private channel: NotificationChannel,
     private hookPort: number,
     private tunnelManager: TunnelManager,
-    private chatResolver?: ChatSessionResolver
+    private chatResolver?: ChatPaneResolver
   ) {}
 
   async handleStopEvent(agentName: string, rawEvent: unknown): Promise<void> {
@@ -73,41 +74,42 @@ export class AgentHandler {
 
     const result = provider.parseEvent(rawEvent);
     logger.debug(
-      `[Stop:raw] agent=${agentName} agentSessionId=${result.agentSessionId ?? "NONE"} project=${result.projectName} tmuxTarget=${result.tmuxTarget ?? "NONE"} cwd=${result.cwd ?? "NONE"}`
+      `[Stop:raw] agent=${agentName} agentSessionId=${result.agentSessionId ?? "NONE"} project=${result.projectName} paneId=${result.paneId ?? "NONE"} cwd=${result.cwd ?? "NONE"}`
     );
 
-    let chatSessionId: string | undefined;
+    let paneId: string | undefined;
     if (this.chatResolver) {
-      chatSessionId = this.chatResolver.resolveSessionId(
+      paneId = this.chatResolver.resolvePaneId(
         result.agentSessionId ?? "",
         result.projectName,
         result.cwd,
-        result.tmuxTarget
+        result.paneId
       );
-      logger.debug(`[Stop:resolved] chatSessionId=${chatSessionId ?? "NONE"}`);
+      logger.debug(`[Stop:resolved] paneId=${paneId ?? "NONE"}`);
     }
 
-    if (!chatSessionId && result.tmuxTarget && this.chatResolver) {
-      chatSessionId = this.chatResolver.resolveOrRegister(
+    if (!paneId && result.paneId && this.chatResolver) {
+      paneId = this.chatResolver.resolveOrRegister(
         result.agentSessionId ?? "",
         result.projectName,
         result.cwd,
-        result.tmuxTarget
+        result.paneId
       );
-      logger.debug(
-        `[Stop:fallback] registered ${chatSessionId} from tmuxTarget=${result.tmuxTarget}`
-      );
+      logger.debug(`[Stop:fallback] registered paneId=${paneId}`);
     }
+
+    const panePid = paneId ? queryPanePid(paneId) : undefined;
 
     const data: NotificationData = {
       agent: provider.name,
       agentDisplayName: provider.displayName,
-      sessionId: chatSessionId,
       ...result,
+      paneId,
+      panePid,
     };
 
-    if (chatSessionId && this.chatResolver) {
-      this.chatResolver.onStopHook(chatSessionId, result.model);
+    if (paneId && this.chatResolver) {
+      this.chatResolver.onStopHook(paneId, result.model);
     }
 
     const responseUrl = this.buildResponseUrl(data);
@@ -131,17 +133,12 @@ export class AgentHandler {
     if (!event) return;
 
     logger.debug(
-      `[AskQ:raw] agentSessionId=${event.sessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"} cwd=${event.cwd ?? "NONE"} questions=${event.questions.length}`
+      `[AskQ:raw] agentSessionId=${event.sessionId} paneId=${event.paneId ?? "NONE"} cwd=${event.cwd ?? "NONE"} questions=${event.questions.length}`
     );
 
     let sessionId: string | undefined;
     if (this.chatResolver) {
-      sessionId = this.chatResolver.resolveSessionId(
-        event.sessionId,
-        "",
-        event.cwd,
-        event.tmuxTarget
-      );
+      sessionId = this.chatResolver.resolvePaneId(event.sessionId, "", event.cwd, event.paneId);
       logger.debug(
         `[AskQ:resolved] agentSessionId=${event.sessionId} → resolvedSessionId=${sessionId ?? "NONE"}`
       );
@@ -149,7 +146,7 @@ export class AgentHandler {
 
     const finalSessionId = sessionId ?? event.sessionId;
     logger.debug(
-      `[AskQ:forward] finalSessionId=${finalSessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"}`
+      `[AskQ:forward] finalSessionId=${finalSessionId} paneId=${event.paneId ?? "NONE"}`
     );
     this.onAskUserQuestion?.({ ...event, sessionId: finalSessionId });
   }
@@ -159,23 +156,18 @@ export class AgentHandler {
     if (!event) return;
 
     logger.debug(
-      `[PermReq:raw] agentSessionId=${event.sessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"} tool=${event.toolName}`
+      `[PermReq:raw] agentSessionId=${event.sessionId} paneId=${event.paneId ?? "NONE"} tool=${event.toolName}`
     );
 
     let sessionId: string | undefined;
     if (this.chatResolver) {
-      sessionId = this.chatResolver.resolveSessionId(
-        event.sessionId,
-        "",
-        event.cwd,
-        event.tmuxTarget
-      );
+      sessionId = this.chatResolver.resolvePaneId(event.sessionId, "", event.cwd, event.paneId);
       logger.debug(`[PermReq:resolved] ${event.sessionId} → ${sessionId ?? "NONE"}`);
     }
 
     const finalSessionId = sessionId ?? event.sessionId;
     logger.debug(
-      `[PermReq:forward] finalSessionId=${finalSessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"}`
+      `[PermReq:forward] finalSessionId=${finalSessionId} paneId=${event.paneId ?? "NONE"}`
     );
     this.onPermissionRequest?.({ ...event, sessionId: finalSessionId });
   }
@@ -185,17 +177,12 @@ export class AgentHandler {
     if (!event) return;
 
     logger.debug(
-      `[Notif:raw] agentSessionId=${event.sessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"} type=${event.notificationType}`
+      `[Notif:raw] agentSessionId=${event.sessionId} paneId=${event.paneId ?? "NONE"} type=${event.notificationType}`
     );
 
     let sessionId: string | undefined;
     if (this.chatResolver) {
-      sessionId = this.chatResolver.resolveSessionId(
-        event.sessionId,
-        "",
-        event.cwd,
-        event.tmuxTarget
-      );
+      sessionId = this.chatResolver.resolvePaneId(event.sessionId, "", event.cwd, event.paneId);
       logger.debug(`[Notif:resolved] ${event.sessionId} → ${sessionId ?? "NONE"}`);
     }
 
@@ -203,9 +190,7 @@ export class AgentHandler {
       sessionId = event.sessionId;
     }
 
-    logger.debug(
-      `[Notif:forward] finalSessionId=${sessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"}`
-    );
+    logger.debug(`[Notif:forward] finalSessionId=${sessionId} paneId=${event.paneId ?? "NONE"}`);
     this.onNotification?.({ ...event, sessionId });
   }
 
@@ -263,7 +248,7 @@ export class AgentHandler {
 
     return {
       sessionId,
-      tmuxTarget: validateTmuxTarget(obj.tmux_target),
+      paneId: validatePaneId(obj.pane_id),
       cwd: typeof obj.cwd === "string" ? obj.cwd : undefined,
       agent: typeof obj.agent === "string" ? obj.agent : undefined,
       questions,
@@ -290,7 +275,7 @@ export class AgentHandler {
       message,
       title: typeof obj.title === "string" ? obj.title : undefined,
       cwd: typeof obj.cwd === "string" ? obj.cwd : undefined,
-      tmuxTarget: validateTmuxTarget(obj.tmux_target),
+      paneId: validatePaneId(obj.pane_id),
     };
   }
 
@@ -315,7 +300,7 @@ export class AgentHandler {
       toolInput,
       permissionMode: typeof obj.permission_mode === "string" ? obj.permission_mode : undefined,
       cwd: typeof obj.cwd === "string" ? obj.cwd : undefined,
-      tmuxTarget: validateTmuxTarget(obj.tmux_target),
+      paneId: validatePaneId(obj.pane_id),
     };
   }
 }
