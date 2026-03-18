@@ -719,14 +719,15 @@ export class TelegramChannel implements NotificationChannel {
   }
 
   private getAvailableProjectAgents(cfg: Config): AgentName[] {
+    const validAgents = new Set<string>(Object.values(AgentName));
     const configuredAgents = cfg.agents.filter((agent): agent is AgentName =>
-      Object.values(AgentName).includes(agent as AgentName)
+      validAgents.has(agent)
     );
     const fallbackAgents = this.registry?.detectInstalled().map((provider) => provider.name) ?? [];
     const filterAvailable = (agents: AgentName[]): AgentName[] =>
       agents.filter((agent) => {
         const command = AGENT_START_COMMANDS[agent];
-        const binary = command?.split(" ")[0];
+        const binary = command?.trim().split(/\s+/)[0];
         return Boolean(binary && isCommandAvailable(binary));
       });
 
