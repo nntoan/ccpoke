@@ -269,6 +269,7 @@ export interface TranslationKeys {
     chooseAgent: string;
     started: string;
     startFailed: string;
+    noAgentCli: string;
     noTmux: string;
     stale: string;
   };

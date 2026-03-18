@@ -127,6 +127,9 @@ tmux attach
 tmux -CC attach
 ```
 
+> `ccpoke /sessions` và các phiên khởi chạy từ `/projects` trên Telegram chỉ theo dõi pane bên trong tmux.  
+> Nếu OpenCode chạy ở tab terminal thường riêng biệt thì sẽ không hiện — hãy chạy OpenCode trong tmux (hoặc khởi chạy từ `/projects`).
+
 ### Đăng ký dự án
 
 Đăng ký dự án để tạo phiên agent mới trực tiếp từ Telegram — không cần mở máy tính.

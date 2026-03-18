@@ -284,6 +284,7 @@ export const zh: TranslationKeys = {
     chooseAgent: "为 {project} 选择代理:",
     started: "✅ 已在 {project} 中启动代理",
     startFailed: "无法为 {project} 启动面板",
+    noAgentCli: "PATH 中未找到已配置的代理 CLI。请运行 'ccpoke setup' 重新选择已安装代理。",
     noTmux: "tmux 不可用 — 无法创建新面板",
     stale: "项目列表已更改。请重新使用 /projects。",
   },

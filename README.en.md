@@ -127,6 +127,9 @@ tmux attach
 tmux -CC attach
 ```
 
+> `ccpoke /sessions` and Telegram-launched `/projects` sessions only track panes inside tmux.  
+> If OpenCode is running in a separate regular terminal tab, it will not appear — start OpenCode inside tmux (or launch it from `/projects`).
+
 ### Register Projects
 
 Register projects to create new agent sessions directly from Telegram — no need to open your computer.

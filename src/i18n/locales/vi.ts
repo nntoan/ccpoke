@@ -288,6 +288,8 @@ export const vi: TranslationKeys = {
     chooseAgent: "Chọn agent cho {project}:",
     started: "✅ Đã khởi động agent trong {project}",
     startFailed: "Không thể khởi động panel cho {project}",
+    noAgentCli:
+      "Không tìm thấy CLI agent đã cấu hình trong PATH. Hãy chạy 'ccpoke setup' để chọn lại agent đã cài.",
     noTmux: "tmux không khả dụng — không thể tạo panel mới",
     stale: "Danh sách project đã thay đổi. Hãy dùng /projects lại.",
   },

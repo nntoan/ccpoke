@@ -18,8 +18,9 @@ import type { TmuxBridge } from "../../tmux/tmux-bridge.js";
 import { checkPaneHealth } from "../../tmux/tmux-scanner.js";
 import { logger } from "../../utils/log.js";
 import { truncateMarkdown } from "../../utils/markdown.js";
+import { isCommandAvailable } from "../../utils/shell.js";
 import { formatModelName } from "../../utils/stats-format.js";
-import { autoAcceptStartupPrompts, launchAgent } from "../agent-launcher.js";
+import { AGENT_START_COMMANDS, autoAcceptStartupPrompts, launchAgent } from "../agent-launcher.js";
 import { buildSessionLabel } from "../session-label.js";
 import type { ChannelDeps, NotificationChannel, NotificationData } from "../types.js";
 import { AskQuestionHandler } from "./ask-question-handler.js";
@@ -213,7 +214,8 @@ export class TelegramChannel implements NotificationChannel {
       await this.bot.setMyCommands(commands);
       logger.info(t("bot.commandsRegistered"));
     } catch (err: unknown) {
-      logger.error({ err }, t("bot.commandsRegisterFailed"));
+      logger.warn({ error: TelegramChannel.getErrorMessage(err) }, t("bot.commandsRegisterFailed"));
+      logger.debug({ err }, "telegram commands registration error details");
     }
   }
 
@@ -224,8 +226,14 @@ export class TelegramChannel implements NotificationChannel {
       } as Record<string, unknown>);
       logger.info(t("bot.menuButtonRegistered"));
     } catch (err: unknown) {
-      logger.error({ err }, t("bot.menuButtonFailed"));
+      logger.warn({ error: TelegramChannel.getErrorMessage(err) }, t("bot.menuButtonFailed"));
+      logger.debug({ err }, "telegram menu button registration error details");
     }
+  }
+
+  private static getErrorMessage(err: unknown): string {
+    if (err instanceof Error && err.message) return err.message;
+    return String(err);
   }
 
   private registerHandlers(): void {
@@ -629,7 +637,12 @@ export class TelegramChannel implements NotificationChannel {
 
     await this.bot.answerCallbackQuery(query.id);
 
-    const agents = cfg.agents;
+    const agents = this.getAvailableProjectAgents(cfg);
+    if (agents.length === 0) {
+      await this.bot.sendMessage(query.message.chat.id, padMaxWidth(t("projects.noAgentCli")));
+      return;
+    }
+
     if (agents.length === 1) {
       await this.startAgentForProject(query, project, agents[0]!);
       return;
@@ -703,6 +716,24 @@ export class TelegramChannel implements NotificationChannel {
         padMaxWidth(t("projects.startFailed", { project: project.name }))
       );
     }
+  }
+
+  private getAvailableProjectAgents(cfg: Config): AgentName[] {
+    const configuredAgents = cfg.agents.filter((agent): agent is AgentName =>
+      Object.values(AgentName).includes(agent as AgentName)
+    );
+    const fallbackAgents = this.registry?.detectInstalled().map((provider) => provider.name) ?? [];
+    const filterAvailable = (agents: AgentName[]): AgentName[] =>
+      agents.filter((agent) => {
+        const command = AGENT_START_COMMANDS[agent];
+        const binary = command?.split(" ")[0];
+        return Boolean(binary && isCommandAvailable(binary));
+      });
+
+    const availableConfigured = filterAvailable(configuredAgents);
+    if (availableConfigured.length > 0) return availableConfigured;
+
+    return filterAvailable(fallbackAgents);
   }
 
   private async handleSessionCallback(query: TelegramBot.CallbackQuery): Promise<void> {
