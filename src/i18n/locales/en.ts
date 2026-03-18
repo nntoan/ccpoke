@@ -6,9 +6,9 @@ export const en: TranslationKeys = {
     shuttingDown: "shutting down...",
     telegramStarted: "telegram bot started",
     commandsRegistered: "commands registered",
-    commandsRegisterFailed: "failed to register commands",
+    commandsRegisterFailed: "failed to register commands (non-fatal, bot is still running)",
     menuButtonRegistered: "commands menu button registered",
-    menuButtonFailed: "failed to register menu button",
+    menuButtonFailed: "failed to register menu button (non-fatal, bot is still running)",
     noChatId: "no chat ID yet — run 'ccpoke setup' or send /start to the bot",
     notificationFailed: "failed to send notification",
     registeredChatId: "registered chat ID {chatId}",
@@ -287,8 +287,12 @@ export const en: TranslationKeys = {
     empty: "No projects registered. Run 'ccpoke project' to add one.",
     chooseAgent: "Choose agent for {project}:",
     started: "✅ Agent started in {project}",
+    startedNoTmux:
+      "✅ Started {agent} in {project} without tmux. Notifications work, but /sessions and chat controls require tmux.",
     startFailed: "Failed to start panel for {project}",
-    noTmux: "tmux not available — cannot create new panels",
+    noAgentCli:
+      "No configured agent CLI found in PATH. Run 'ccpoke setup' to select installed agents.",
+    noTmux: "tmux not available — /sessions and chat controls are disabled",
     stale: "Project list changed. Use /projects again.",
   },
   prompt: {

@@ -283,8 +283,11 @@ export const zh: TranslationKeys = {
     empty: "未注册任何项目。运行 'ccpoke project' 添加。",
     chooseAgent: "为 {project} 选择代理:",
     started: "✅ 已在 {project} 中启动代理",
+    startedNoTmux:
+      "✅ 已在无 tmux 模式下于 {project} 启动 {agent}。通知可用，但 /sessions 和聊天控制需要 tmux。",
     startFailed: "无法为 {project} 启动面板",
-    noTmux: "tmux 不可用 — 无法创建新面板",
+    noAgentCli: "PATH 中未找到已配置的代理 CLI。请运行 'ccpoke setup' 重新选择已安装代理。",
+    noTmux: "tmux 不可用 — /sessions 与聊天控制将被禁用",
     stale: "项目列表已更改。请重新使用 /projects。",
   },
   prompt: {

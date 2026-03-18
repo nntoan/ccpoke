@@ -268,7 +268,9 @@ export interface TranslationKeys {
     empty: string;
     chooseAgent: string;
     started: string;
+    startedNoTmux: string;
     startFailed: string;
+    noAgentCli: string;
     noTmux: string;
     stale: string;
   };

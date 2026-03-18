@@ -40,7 +40,7 @@ Adding new agents is easy via the plugin architecture — contributions welcome!
 ## Requirements
 
 - **Node.js** ≥ 20
-- **tmux** — required for two-way interaction (auto-installed on first run)
+- **tmux** — optional, but required for `/sessions` and full two-way chat controls
 - **Telegram Bot Token** — create from [@BotFather](https://t.me/BotFather)
 
 ## Getting Started
@@ -127,6 +127,9 @@ tmux attach
 tmux -CC attach
 ```
 
+> `ccpoke /sessions` and Telegram-launched `/projects` sessions only track panes inside tmux.  
+> If OpenCode is running in a separate regular terminal tab, it will not appear — start OpenCode inside tmux (or launch it from `/projects`).
+
 ### Register Projects
 
 Register projects to create new agent sessions directly from Telegram — no need to open your computer.
@@ -155,6 +158,8 @@ ccpoke project
 **Step 2: Create agent sessions from Telegram**
 
 Send `/projects` on Telegram → pick a project → choose agent (Claude Code / Codex CLI / Cursor CLI) → agent starts in a new tmux pane.
+
+If tmux is unavailable, ccpoke can still launch the selected agent as a detached background process for notifications. In this mode, `/sessions` and interactive chat controls remain disabled.
 
 ### Telegram Commands
 
