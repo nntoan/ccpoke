@@ -14,7 +14,7 @@ import {
   detectInstallMethod,
   getGitRepoRoot,
 } from "../utils/install-detection.js";
-import { getPackageVersion } from "../utils/paths.js";
+import { getPackageName, getPackageVersion } from "../utils/paths.js";
 
 export function runUpdate(): void {
   const method = detectInstallMethod();
@@ -38,7 +38,7 @@ export function runUpdate(): void {
 
 function updateGlobal(): void {
   const pm = detectGlobalPackageManager();
-  const pkg = "ccpoke";
+  const pkg = getPackageName();
 
   p.intro(t("update.intro"));
 

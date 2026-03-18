@@ -48,7 +48,7 @@ AI 代理完成响应
 ### 方式一：npx（零安装）
 
 ```bash
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 ```
 
 首次运行 → 自动设置 → 启动机器人。一条命令搞定。
@@ -56,7 +56,7 @@ npx -y ccpoke
 ### 方式二：全局安装（推荐——启动更快）
 
 ```bash
-npm i -g ccpoke
+npm i -g @nntoan/ccpoke
 ccpoke
 ```
 
@@ -106,7 +106,7 @@ ccpoke
 
 ```bash
 # npx（零安装）
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 
 # 或全局安装
 ccpoke

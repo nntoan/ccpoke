@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { InstallMethod, PackageManager } from "./constants.js";
+import { getPackageName } from "./paths.js";
 
 const MAX_GIT_SEARCH_DEPTH = 5;
 export type { InstallMethod } from "./constants.js";
@@ -23,9 +24,10 @@ export function detectInstallMethod(): InstallMethod {
 
 export function detectCliPrefix(): string {
   const method = detectInstallMethod();
+  const packageName = getPackageName();
   switch (method) {
     case InstallMethod.Npx:
-      return "npx -y ccpoke";
+      return `npx -y ${packageName}`;
     case InstallMethod.GitClone:
       return "node dist/index.js";
     default:

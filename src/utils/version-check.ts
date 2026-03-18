@@ -5,9 +5,8 @@ import * as p from "@clack/prompts";
 import { t } from "../i18n/index.js";
 import { InstallMethod, PackageManager } from "./constants.js";
 import { detectGlobalPackageManager, detectInstallMethod } from "./install-detection.js";
-import { getPackageVersion } from "./paths.js";
+import { getPackageName, getPackageVersion } from "./paths.js";
 
-const NPM_REGISTRY_URL = "https://registry.npmjs.org/ccpoke/latest";
 const VERSION_CHECK_TIMEOUT_MS = 5_000;
 
 export interface UpdateInfo {
@@ -30,9 +29,10 @@ function isNewerVersion(current: string, latest: string): boolean {
 }
 
 function getUpdateCommand(method: InstallMethod): string {
+  const packageName = getPackageName();
   switch (method) {
     case InstallMethod.Npx:
-      return "npx -y ccpoke@latest";
+      return `npx -y ${packageName}@latest`;
     case InstallMethod.GitClone:
       return "git pull && npm run build";
     case InstallMethod.Global:
@@ -42,13 +42,17 @@ function getUpdateCommand(method: InstallMethod): string {
 
 async function fetchLatestVersion(): Promise<string | null> {
   try {
+    const packageName = getPackageName();
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), VERSION_CHECK_TIMEOUT_MS);
 
-    const response = await fetch(NPM_REGISTRY_URL, {
-      signal: controller.signal,
-      headers: { Accept: "application/json" },
-    });
+    const response = await fetch(
+      `https://registry.npmjs.org/${encodeURIComponent(packageName)}/latest`,
+      {
+        signal: controller.signal,
+        headers: { Accept: "application/json" },
+      }
+    );
 
     clearTimeout(timeout);
 
@@ -79,7 +83,7 @@ async function runUpdateInline(): Promise<
   { ok: true } | { ok: false; cmd: string; error: string }
 > {
   const pm = detectGlobalPackageManager();
-  const pkg = "ccpoke";
+  const pkg = getPackageName();
   const cmd =
     pm === PackageManager.Yarn ? `yarn global add ${pkg}` : `${pm} install -g ${pkg}@latest`;
 

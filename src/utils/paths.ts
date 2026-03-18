@@ -101,6 +101,14 @@ export function getPackageVersion(): string {
   }
 }
 
+export function getPackageName(): string {
+  try {
+    return JSON.parse(readFileSync(paths.packageJson, "utf-8")).name;
+  } catch {
+    return "ccpoke";
+  }
+}
+
 export function toPosixPath(filepath: string): string {
   return filepath.replace(/\\/g, "/");
 }

@@ -48,7 +48,7 @@ Thêm agent mới qua kiến trúc plugin — hoan nghênh đóng góp!
 ### Cách 1: npx (không cần cài đặt)
 
 ```bash
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 ```
 
 Lần đầu chạy → tự động thiết lập → khởi động bot. Một lệnh duy nhất.
@@ -56,7 +56,7 @@ Lần đầu chạy → tự động thiết lập → khởi động bot. Một
 ### Cách 2: Cài đặt toàn cục (khuyến nghị — khởi động nhanh hơn)
 
 ```bash
-npm i -g ccpoke
+npm i -g @nntoan/ccpoke
 ccpoke
 ```
 
@@ -106,7 +106,7 @@ Trình hướng dẫn cài đặt sẽ dẫn bạn từng bước:
 
 ```bash
 # npx (không cần cài đặt)
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 
 # Hoặc cài đặt toàn cục
 ccpoke

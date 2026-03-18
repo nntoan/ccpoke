@@ -32,7 +32,7 @@ export const en: TranslationKeys = {
     sendFailed: "send failed, falling back",
     sendFallbackFailed: "fallback also failed",
     firstTimeSetup: "no config found — starting setup wizard...",
-    globalInstallTip: "💡 Tip: run 'npm i -g ccpoke' for faster startup",
+    globalInstallTip: "💡 Tip: run 'npm i -g @nntoan/ccpoke' for faster startup",
     alreadyRunning:
       "another ccpoke is already running on port {port}\n\n  To stop it:\n    {killCommand}\n",
     twowayEnabled: "📱 2-way chat: enabled",
@@ -125,7 +125,7 @@ export const en: TranslationKeys = {
     hookNotFound: "No hook found (already removed)",
     configRemoved: "Removed ~/.ccpoke/ (config, state, hooks)",
     configNotFound: "~/.ccpoke/ not found (already removed)",
-    removeGlobal: "To also remove the package:\n  pnpm remove -g ccpoke",
+    removeGlobal: "To also remove the package:\n  pnpm remove -g @nntoan/ccpoke",
     removeGitClone: "To also remove the source:\n  rm -rf <ccpoke-directory>",
     done: "ccpoke uninstalled",
     agentHookRemoved: "{agent} hook removed",
@@ -168,7 +168,7 @@ export const en: TranslationKeys = {
     cmdHelp: "  help        Show this help message",
     cmdProject: "  project     Manage registered projects",
     cmdChannel: "  channel     Switch notification channel (telegram/discord/slack)",
-    docs: "docs → https://github.com/kaida-palooza/ccpoke",
+    docs: "docs → https://github.com/nntoan/ccpoke",
   },
 
   hook: {

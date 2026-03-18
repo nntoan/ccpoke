@@ -31,7 +31,7 @@ export const zh: TranslationKeys = {
     sendFailed: "发送失败，使用备用方式",
     sendFallbackFailed: "备用方式也失败",
     firstTimeSetup: "未找到配置 — 正在启动设置向导...",
-    globalInstallTip: "💡 提示: 运行 'npm i -g ccpoke' 可加快启动速度",
+    globalInstallTip: "💡 提示: 运行 'npm i -g @nntoan/ccpoke' 可加快启动速度",
     alreadyRunning: "另一个 ccpoke 已在端口 {port} 上运行\n\n  停止方法:\n    {killCommand}\n",
     twowayEnabled: "📱 双向聊天: 已启用",
     twowayDisabled: "📱 双向聊天: 已禁用 (无 tmux)",
@@ -122,7 +122,7 @@ export const zh: TranslationKeys = {
     hookNotFound: "未找到 Hook（已移除）",
     configRemoved: "已删除 ~/.ccpoke/（配置、状态、钩子）",
     configNotFound: "未找到 ~/.ccpoke/（已删除）",
-    removeGlobal: "要同时删除包:\n  pnpm remove -g ccpoke",
+    removeGlobal: "要同时删除包:\n  pnpm remove -g @nntoan/ccpoke",
     removeGitClone: "要同时删除源代码:\n  rm -rf <ccpoke-directory>",
     done: "ccpoke 已卸载",
     agentHookRemoved: "{agent} hook 已移除",
@@ -165,7 +165,7 @@ export const zh: TranslationKeys = {
     cmdHelp: "  help        显示此帮助信息",
     cmdProject: "  project     管理已注册项目",
     cmdChannel: "  channel     切换通知渠道 (telegram/discord/slack)",
-    docs: "文档 → https://github.com/kaida-palooza/ccpoke",
+    docs: "文档 → https://github.com/nntoan/ccpoke",
   },
 
   hook: {

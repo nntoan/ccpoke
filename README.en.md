@@ -48,7 +48,7 @@ Adding new agents is easy via the plugin architecture — contributions welcome!
 ### Option 1: npx (zero install)
 
 ```bash
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 ```
 
 First run → auto setup → start bot. One command, that's it.
@@ -56,7 +56,7 @@ First run → auto setup → start bot. One command, that's it.
 ### Option 2: Global install (recommended — faster startup)
 
 ```bash
-npm i -g ccpoke
+npm i -g @nntoan/ccpoke
 ccpoke
 ```
 
@@ -106,7 +106,7 @@ The setup wizard will guide you step by step:
 
 ```bash
 # npx (zero install)
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 
 # Or global install
 ccpoke
