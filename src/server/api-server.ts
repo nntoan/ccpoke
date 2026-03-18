@@ -84,6 +84,9 @@ export class ApiServer {
     app.options(ApiRoute.ResponseData, (_req, res) => {
       const allowedOrigin = this.getAllowedCorsOrigin(_req.headers.origin);
       if (!allowedOrigin) {
+        logger.debug(
+          `[API] OPTIONS ${ApiRoute.ResponseData} rejected origin=${_req.headers.origin ?? "none"}`
+        );
         res.status(403).end();
         return;
       }
@@ -240,7 +243,7 @@ export class ApiServer {
       try {
         allowedOrigins.add(new URL(tunnelUrl).origin);
       } catch {
-        logger.debug(`[API] invalid tunnel url for CORS: ${tunnelUrl}`);
+        logger.warn(`[API] invalid tunnel url for CORS: ${tunnelUrl}`);
       }
     }
 
