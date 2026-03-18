@@ -7,6 +7,7 @@ import { isWindows } from "./constants.js";
 
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = join(MODULE_DIR, "..", "..");
+type PackageMetadata = { name?: string; version?: string };
 
 const CCPOKE_HOME = join(homedir(), ".ccpoke");
 const CLAUDE_HOME = join(homedir(), ".claude");
@@ -93,20 +94,26 @@ export const paths = {
   opencodePluginFile: join(OPENCODE_HOME, "plugins", "ccpoke-notify.js"),
 } as const;
 
-export function getPackageVersion(): string {
+let packageMetadataCache: PackageMetadata | null | undefined;
+
+function getPackageMetadata(): PackageMetadata | null {
+  if (packageMetadataCache !== undefined) return packageMetadataCache;
+
   try {
-    return JSON.parse(readFileSync(paths.packageJson, "utf-8")).version;
+    packageMetadataCache = JSON.parse(readFileSync(paths.packageJson, "utf-8")) as PackageMetadata;
   } catch {
-    return "unknown";
+    packageMetadataCache = null;
   }
+
+  return packageMetadataCache;
+}
+
+export function getPackageVersion(): string {
+  return getPackageMetadata()?.version ?? "unknown";
 }
 
 export function getPackageName(): string {
-  try {
-    return JSON.parse(readFileSync(paths.packageJson, "utf-8")).name;
-  } catch {
-    return "ccpoke";
-  }
+  return getPackageMetadata()?.name ?? "ccpoke";
 }
 
 export function toPosixPath(filepath: string): string {
