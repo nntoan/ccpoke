@@ -48,7 +48,7 @@ Adding new agents is easy via the plugin architecture — contributions welcome!
 ### Option 1: npx (zero install)
 
 ```bash
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 ```
 
 First run → auto setup → start bot. One command, that's it.
@@ -56,7 +56,7 @@ First run → auto setup → start bot. One command, that's it.
 ### Option 2: Global install (recommended — faster startup)
 
 ```bash
-npm i -g ccpoke
+npm i -g @nntoan/ccpoke
 ccpoke
 ```
 
@@ -106,7 +106,7 @@ The setup wizard will guide you step by step:
 
 ```bash
 # npx (zero install)
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 
 # Or global install
 ccpoke
@@ -177,11 +177,24 @@ Fixed authentication bug in login.go. Main changes:
 
 ## Security & Tunnel
 
-ccpoke uses **Cloudflare Quick Tunnel** so the Telegram Mini App can view agent responses. Key security notes:
+Cloudflare Quick Tunnel is optional in ccpoke. Current recommendation:
 
-- **Hook endpoint** — only used by agents calling back to ccpoke, protected by `X-CCPoke-Secret` (auto-generated, crypto hex random). Missing or wrong secret → `403 Forbidden`.
-- **Response endpoint protected by UUID v4** — IDs use `randomUUID()` (122-bit entropy, ~5.3 × 10³⁶ combinations), brute-force is infeasible. Responses auto-expire after 24h.
-- **Quick Tunnel URL is random** — format `https://random-words.trycloudflare.com`, changes on every restart, not fixed or publicly listed.
+- **Use no tunnel by default** if you only need Telegram/Discord/Slack bot notifications and chat controls. Those features are outbound API calls and do not require exposing your localhost.
+- **Enable a tunnel only for web response viewing** (the `/response` mini app link).
+- **Host your own mini app origin** and set `CCPOKE_MINI_APP_BASE_URL` (HTTPS). ccpoke now trusts only the configured mini-app origin and the active tunnel origin for CORS.
+
+What the tunnel URL exposes to the Internet:
+
+- `POST /hook/*` endpoints, protected by `X-CCPoke-Secret` (random 32-byte hex). Invalid secret → `403`.
+- `GET /api/responses/:id` endpoint, with UUID-v4 IDs and 24h TTL in memory.
+- `GET /health` endpoint.
+
+Cloudflare Quick Tunnel trade-offs:
+
+- ✅ Fastest setup (free, no signup, random URL each run)
+- ⚠️ URL rotates on restart, no stable domain, depends on Cloudflare
+- ✅ Good for temporary/mobile access
+- ❗ For stricter control, prefer `tunnel: false` (no exposure) or run your own stable HTTPS endpoint/reverse proxy.
 
 ## Uninstall
 

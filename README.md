@@ -48,7 +48,7 @@ Thêm agent mới qua kiến trúc plugin — hoan nghênh đóng góp!
 ### Cách 1: npx (không cần cài đặt)
 
 ```bash
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 ```
 
 Lần đầu chạy → tự động thiết lập → khởi động bot. Một lệnh duy nhất.
@@ -56,7 +56,7 @@ Lần đầu chạy → tự động thiết lập → khởi động bot. Một
 ### Cách 2: Cài đặt toàn cục (khuyến nghị — khởi động nhanh hơn)
 
 ```bash
-npm i -g ccpoke
+npm i -g @nntoan/ccpoke
 ccpoke
 ```
 
@@ -106,7 +106,7 @@ Trình hướng dẫn cài đặt sẽ dẫn bạn từng bước:
 
 ```bash
 # npx (không cần cài đặt)
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 
 # Hoặc cài đặt toàn cục
 ccpoke
@@ -177,11 +177,24 @@ Gửi `/projects` trên Telegram → chọn dự án → chọn agent (Claude Co
 
 ## Bảo mật & Tunnel
 
-ccpoke sử dụng **Cloudflare Quick Tunnel** để Telegram Mini App có thể xem response từ agent. Một số điểm cần lưu ý:
+Cloudflare Quick Tunnel là tùy chọn. Khuyến nghị hiện tại:
 
-- **Hook endpoint** — chỉ dùng để agent gọi về ccpoke, được bảo vệ bởi `X-CCPoke-Secret` (auto-generate, crypto hex random). Thiếu hoặc sai secret → `403 Forbidden`.
-- **Response endpoint bảo vệ bằng UUID v4** — ID dùng `randomUUID()` (122-bit entropy, ~5.3 × 10³⁶ tổ hợp), brute-force không khả thi. Response tự expire sau 24h.
-- **Quick Tunnel URL ngẫu nhiên** — URL dạng `https://random-words.trycloudflare.com`, thay đổi mỗi lần khởi động, không cố định và không public.
+- **Mặc định không mở tunnel** nếu chỉ cần notification/chat qua Telegram/Discord/Slack. Các tính năng này dùng kết nối outbound, không cần expose localhost.
+- **Chỉ bật tunnel khi cần xem web response** (link mini app `/response`).
+- **Tự host mini app origin của bạn** và set `CCPOKE_MINI_APP_BASE_URL` (HTTPS). ccpoke giờ chỉ cho phép CORS từ origin đã cấu hình và origin tunnel đang chạy.
+
+Tunnel URL sẽ expose gì ra Internet:
+
+- `POST /hook/*` (bảo vệ bởi `X-CCPoke-Secret`, sai secret trả `403`)
+- `GET /api/responses/:id` (ID UUID v4, dữ liệu tự hết hạn sau 24h)
+- `GET /health`
+
+Trade-off của Cloudflare Quick Tunnel:
+
+- ✅ Setup nhanh, miễn phí, không cần signup
+- ⚠️ URL đổi mỗi lần restart, không phải domain cố định
+- ✅ Phù hợp truy cập tạm thời qua điện thoại
+- ❗ Muốn kiểm soát chặt hơn: dùng `tunnel: false` hoặc tự triển khai HTTPS/reverse proxy riêng.
 
 ## Gỡ cài đặt
 

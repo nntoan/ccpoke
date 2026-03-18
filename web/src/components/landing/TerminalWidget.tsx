@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "preact/hooks";
 import copyIcon from "../../assets/icons/copy.svg?raw";
 
-const COMMAND = "npx -y ccpoke";
+const COMMAND = "npx -y @nntoan/ccpoke";
 const ACCENT_START = 7;
 const TYPING_SPEED_MS = 65;
 const TYPING_START_DELAY_MS = 500;

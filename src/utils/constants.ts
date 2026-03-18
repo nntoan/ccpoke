@@ -51,7 +51,8 @@ export const ApiRoute = {
 } as const;
 
 export const DEFAULT_HOOK_PORT = 9377;
-export const MINI_APP_BASE_URL = "https://kaida-palooza.github.io/ccpoke";
+export const NPM_PACKAGE_NAME = "@nntoan/ccpoke";
+export const MINI_APP_BASE_URL = readMiniAppBaseUrl();
 export const CCPOKE_MARKER = "ccpoke";
 
 export const ChannelName = {
@@ -117,4 +118,18 @@ export function refreshWindowsPath(): void {
 
 function expandEnvVars(value: string): string {
   return value.replace(/%([^%]+)%/g, (_, name: string) => process.env[name] ?? `%${name}%`);
+}
+
+function readMiniAppBaseUrl(): string | null {
+  const raw = process.env.CCPOKE_MINI_APP_BASE_URL?.trim();
+  if (!raw) return null;
+
+  try {
+    const parsed = new URL(raw);
+    if (parsed.protocol !== "https:") return null;
+    parsed.hash = "";
+    return parsed.href.endsWith("/") ? parsed.href.slice(0, -1) : parsed.href;
+  } catch {
+    return null;
+  }
 }

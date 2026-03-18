@@ -8,7 +8,7 @@ import { createDefaultRegistry } from "../agent/agent-registry.js";
 import { ConfigManager } from "../config-manager.js";
 import { HookEnvWriter } from "../hooks/hook-env-writer.js";
 import { t } from "../i18n/index.js";
-import { InstallMethod, PackageManager } from "../utils/constants.js";
+import { InstallMethod, NPM_PACKAGE_NAME, PackageManager } from "../utils/constants.js";
 import {
   detectGlobalPackageManager,
   detectInstallMethod,
@@ -38,7 +38,7 @@ export function runUpdate(): void {
 
 function updateGlobal(): void {
   const pm = detectGlobalPackageManager();
-  const pkg = "ccpoke";
+  const pkg = NPM_PACKAGE_NAME;
 
   p.intro(t("update.intro"));
 

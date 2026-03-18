@@ -48,7 +48,7 @@ AI 代理完成响应
 ### 方式一：npx（零安装）
 
 ```bash
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 ```
 
 首次运行 → 自动设置 → 启动机器人。一条命令搞定。
@@ -56,7 +56,7 @@ npx -y ccpoke
 ### 方式二：全局安装（推荐——启动更快）
 
 ```bash
-npm i -g ccpoke
+npm i -g @nntoan/ccpoke
 ccpoke
 ```
 
@@ -106,7 +106,7 @@ ccpoke
 
 ```bash
 # npx（零安装）
-npx -y ccpoke
+npx -y @nntoan/ccpoke
 
 # 或全局安装
 ccpoke
@@ -177,11 +177,24 @@ ccpoke project
 
 ## 安全与隧道
 
-ccpoke 使用 **Cloudflare Quick Tunnel**，使 Telegram Mini App 能够查看 agent 响应。安全要点：
+Cloudflare Quick Tunnel 在 ccpoke 中是可选项。当前建议：
 
-- **Hook 端点** — 仅供 agent 回调 ccpoke 使用，由 `X-CCPoke-Secret` 保护（自动生成，加密十六进制随机）。缺少或错误的密钥 → `403 Forbidden`。
-- **Response 端点由 UUID v4 保护** — ID 使用 `randomUUID()`（122 位熵，~5.3 × 10³⁶ 种组合），暴力破解不可行。响应在 24 小时后自动过期。
-- **Quick Tunnel URL 是随机的** — 格式为 `https://random-words.trycloudflare.com`，每次重启都会变化，不固定且不公开。
+- **默认不启用 tunnel**：如果你只需要 Telegram/Discord/Slack 的通知和聊天控制，这些能力是 outbound 连接，不需要暴露本地服务。
+- **仅在需要查看 web response 时启用 tunnel**（即 mini app `/response` 链接）。
+- **使用你自己的 mini app 域名**并设置 `CCPOKE_MINI_APP_BASE_URL`（必须 HTTPS）。ccpoke 现在只信任你配置的 mini-app origin 和当前 tunnel origin 的 CORS 请求。
+
+Tunnel URL 对外暴露的接口：
+
+- `POST /hook/*`（由 `X-CCPoke-Secret` 保护，错误密钥返回 `403`）
+- `GET /api/responses/:id`（UUID v4 ID，数据在内存中 24 小时过期）
+- `GET /health`
+
+Cloudflare Quick Tunnel 的取舍：
+
+- ✅ 配置最快（免费、无需注册、每次随机 URL）
+- ⚠️ 重启后 URL 会变化，不是固定域名
+- ✅ 适合临时/移动场景访问
+- ❗ 若要更严格控制，使用 `tunnel: false` 或自建稳定 HTTPS 入口（反向代理）。
 
 ## 卸载
 

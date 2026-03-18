@@ -32,7 +32,7 @@ const en = {
   setupStep1Title: "Create a bot token",
   setupStep1Desc: '<strong>Telegram:</strong> open <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> → <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> → copy token.<br/><br/><strong>Discord:</strong> <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Developer Portal</a> → New Application → Bot → copy token.<br/><br/><strong>Slack:</strong> <a href="https://api.slack.com/apps" target="_blank" rel="noopener">Slack API</a> → Create New App → <strong>From scratch</strong> → name your app & pick workspace → OAuth & Permissions → add <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">chat:write</code> scope → scroll up to OAuth Tokens → generate and copy <strong>Bot User OAuth Token</strong>.',
   setupStep2Title: "Run one command",
-  setupStep2Desc: 'The setup wizard handles everything — hooks, bot connection, agent selection. For daily use, install globally: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g ccpoke</code>.',
+  setupStep2Desc: 'The setup wizard handles everything — hooks, bot connection, agent selection. For daily use, install globally: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g @nntoan/ccpoke</code>.',
   setupStep3Title: "Done!",
   setupStep3Desc: 'Follow the wizard to connect your bot. Setup is automatic — no manual config needed.',
 
@@ -152,7 +152,7 @@ const en = {
   docsFaq4Q: "Can I use it on Windows?",
   docsFaq4A: "Push notifications (Phase 1) work on Windows. Two-way chat (Phase 2+) requires macOS or Linux due to tmux dependency.",
   docsFaq5Q: "How do I update?",
-  docsFaq5A: "Run <code>ccpoke update</code> or <code>npm i -g ccpoke@latest</code> to get the latest version.",
+  docsFaq5A: "Run <code>ccpoke update</code> or <code>npm i -g @nntoan/ccpoke@latest</code> to get the latest version.",
   docsFaq6Q: "How secure is it?",
   docsFaq6A: "ccpoke runs locally on your machine. Communication goes through your own bot (Telegram, Discord, or Slack). No third-party servers involved — your code and prompts never leave your machine.",
   docsFaq7Q: "How do I use it on a remote server?",
@@ -187,8 +187,8 @@ const en = {
   docsStep1Title: "Create a Bot Token",
   docsStep1Desc: 'Open <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> on Telegram → <code>/newbot</code> → save the token.',
   docsStep2Title: "Run the setup",
-  docsStep2Desc: '<code>npx -y ccpoke</code> runs ccpoke without installing — great for trying it out. For regular use, install globally with <code>npm i -g ccpoke</code> (recommended).',
-  docsStep2Term: "# Quick try (no install):\n$ npx -y ccpoke\n\n# Recommended (install globally):\n$ npm i -g ccpoke\n$ ccpoke",
+  docsStep2Desc: '<code>npx -y @nntoan/ccpoke</code> runs ccpoke without installing — great for trying it out. For regular use, install globally with <code>npm i -g @nntoan/ccpoke</code> (recommended).',
+  docsStep2Term: "# Quick try (no install):\n$ npx -y @nntoan/ccpoke\n\n# Recommended (install globally):\n$ npm i -g @nntoan/ccpoke\n$ ccpoke",
   docsStep3Title: "Connect your phone",
   docsStep3Desc: "Scan the QR code or click the link shown in terminal. Setup is automatic — no manual User ID needed.",
 

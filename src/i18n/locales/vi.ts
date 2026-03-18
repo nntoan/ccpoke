@@ -32,7 +32,7 @@ export const vi: TranslationKeys = {
     sendFailed: "gửi thất bại, dùng fallback",
     sendFallbackFailed: "fallback cũng thất bại",
     firstTimeSetup: "chưa có config — bắt đầu setup...",
-    globalInstallTip: "💡 Tip: chạy 'npm i -g ccpoke' để khởi động nhanh hơn",
+    globalInstallTip: "💡 Tip: chạy 'npm i -g @nntoan/ccpoke' để khởi động nhanh hơn",
     alreadyRunning:
       "một ccpoke khác đang chạy trên port {port}\n\n  Để dừng nó:\n    {killCommand}\n",
     twowayEnabled: "📱 Chat 2 chiều: đã bật",
@@ -135,7 +135,7 @@ export const vi: TranslationKeys = {
     hookNotFound: "Không tìm thấy hook (đã xóa rồi)",
     configRemoved: "Đã xóa ~/.ccpoke/ (config, state, hooks)",
     configNotFound: "Không tìm thấy ~/.ccpoke/ (đã xóa rồi)",
-    removeGlobal: "Để gỡ package:\n  pnpm remove -g ccpoke",
+    removeGlobal: "Để gỡ package:\n  pnpm remove -g @nntoan/ccpoke",
     removeGitClone: "Để xóa source:\n  rm -rf <ccpoke-directory>",
     done: "Đã gỡ ccpoke",
     agentHookRemoved: "Đã gỡ hook cho {agent}",
@@ -179,7 +179,7 @@ export const vi: TranslationKeys = {
     cmdProject: "  project     Quản lý project đã đăng ký",
     cmdChannel: "  channel     Chuyển kênh thông báo (telegram/discord/slack)",
     cmdBug: "  bug         Báo lỗi (thu thập thông tin chẩn đoán + log)",
-    docs: "docs → https://github.com/kaida-palooza/ccpoke",
+    docs: "docs → https://github.com/nntoan/ccpoke",
   },
 
   hook: {

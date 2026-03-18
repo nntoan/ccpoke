@@ -9,7 +9,7 @@ import { isMacOS, isWindows } from "../utils/constants.js";
 import { LOG_FILE } from "../utils/log.js";
 import { getPackageVersion, paths } from "../utils/paths.js";
 
-const ISSUES_URL = "https://github.com/kaida-palooza/ccpoke/issues/new";
+const ISSUES_URL = "https://github.com/nntoan/ccpoke/issues/new";
 
 const SENSITIVE_PATTERNS: [RegExp, string][] = [
   [/https?:\/\/[a-z0-9-]+\.trycloudflare\.com\b/gi, "https://***.trycloudflare.com"],
