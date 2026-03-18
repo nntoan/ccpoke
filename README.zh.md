@@ -40,7 +40,7 @@ AI 代理完成响应
 ## 前置要求
 
 - **Node.js** ≥ 20
-- **tmux** — 双向交互需要（首次运行自动安装）
+- **tmux** — 可选，但 `/sessions` 与完整双向聊天控制需要它
 - **Telegram Bot Token** — 从 [@BotFather](https://t.me/BotFather) 创建
 
 ## 快速开始
@@ -158,6 +158,8 @@ ccpoke project
 **第二步：从 Telegram 创建代理会话**
 
 在 Telegram 发送 `/projects` → 选择项目 → 选择代理（Claude Code / Codex CLI / Cursor CLI）→ 代理在新的 tmux 面板中启动。
+
+如果没有 tmux，ccpoke 仍可用 detached 后台进程方式启动所选代理并发送通知。在该模式下，`/sessions` 与交互式聊天控制会被禁用。
 
 ### Telegram 命令
 

@@ -40,7 +40,7 @@ Thêm agent mới qua kiến trúc plugin — hoan nghênh đóng góp!
 ## Yêu cầu
 
 - **Node.js** ≥ 20
-- **tmux** — cần cho tương tác 2 chiều (tự cài khi chạy lần đầu)
+- **tmux** — tùy chọn, nhưng cần cho `/sessions` và đầy đủ chat 2 chiều
 - **Telegram Bot Token** — tạo từ [@BotFather](https://t.me/BotFather)
 
 ## Bắt đầu
@@ -158,6 +158,8 @@ ccpoke project
 **Bước 2: Tạo phiên agent từ Telegram**
 
 Gửi `/projects` trên Telegram → chọn dự án → chọn agent (Claude Code / Codex CLI / Cursor CLI) → agent khởi chạy trong ô tmux mới.
+
+Nếu không có tmux, ccpoke vẫn có thể chạy agent ở chế độ detached nền để gửi notification. Ở chế độ này, `/sessions` và chat control tương tác sẽ bị tắt.
 
 ### Lệnh Telegram
 

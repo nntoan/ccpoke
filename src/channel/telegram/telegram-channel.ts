@@ -20,7 +20,12 @@ import { logger } from "../../utils/log.js";
 import { truncateMarkdown } from "../../utils/markdown.js";
 import { isCommandAvailable } from "../../utils/shell.js";
 import { formatModelName } from "../../utils/stats-format.js";
-import { AGENT_START_COMMANDS, autoAcceptStartupPrompts, launchAgent } from "../agent-launcher.js";
+import {
+  autoAcceptStartupPrompts,
+  getAgentBinary,
+  launchAgent,
+  launchAgentWithoutTmux,
+} from "../agent-launcher.js";
 import { buildSessionLabel } from "../session-label.js";
 import type { ChannelDeps, NotificationChannel, NotificationData } from "../types.js";
 import { AskQuestionHandler } from "./ask-question-handler.js";
@@ -630,11 +635,6 @@ export class TelegramChannel implements NotificationChannel {
       return;
     }
 
-    if (!this.tmuxBridge || !this.tmuxBridge.isTmuxAvailable()) {
-      await this.bot.answerCallbackQuery(query.id, { text: t("projects.noTmux") });
-      return;
-    }
-
     await this.bot.answerCallbackQuery(query.id);
 
     const agents = this.getAvailableProjectAgents(cfg);
@@ -671,32 +671,50 @@ export class TelegramChannel implements NotificationChannel {
     const cfg = ConfigManager.load();
     const project = cfg.projects[idx];
 
-    if (!project || !agentKey || !query.message) {
+    if (!project || !agentKey || !query.message || !TelegramChannel.isValidAgentKey(agentKey)) {
       await this.bot.answerCallbackQuery(query.id);
       return;
     }
 
     await this.bot.answerCallbackQuery(query.id);
     await this.bot.deleteMessage(query.message.chat.id, query.message.message_id).catch(() => {});
-    await this.startAgentForProject(query, project, agentKey);
+    await this.startAgentForProject(query, project, agentKey as AgentName);
   }
 
   private async startAgentForProject(
     query: TelegramBot.CallbackQuery,
     project: { name: string; path: string },
-    agentKey: string
+    agentKey: AgentName
   ): Promise<void> {
-    if (!this.tmuxBridge || !query.message) return;
+    if (!query.message) return;
 
     try {
-      const { paneId, needsTrust } = launchAgent(this.tmuxBridge, project.path, agentKey);
+      const tmuxBridge = this.tmuxBridge;
+      const tmuxAvailable = Boolean(tmuxBridge?.isTmuxAvailable());
+      if (!tmuxAvailable) {
+        const { pid } = launchAgentWithoutTmux(project.path, agentKey);
+        logger.info(`[Projects] started ${agentKey} pid=${pid} without tmux for ${project.name}`);
+        await this.bot.sendMessage(
+          query.message.chat.id,
+          padMaxWidth(
+            t("projects.startedNoTmux", {
+              project: project.name,
+              agent: AGENT_DISPLAY_NAMES[agentKey] ?? agentKey,
+            })
+          )
+        );
+        return;
+      }
 
-      this.paneRegistry?.register(paneId, project.name, project.path, "", agentKey as AgentName);
+      const activeTmuxBridge = tmuxBridge!;
+      const { paneId, needsTrust } = launchAgent(activeTmuxBridge, project.path, agentKey);
+
+      this.paneRegistry?.register(paneId, project.name, project.path, "", agentKey);
       this.paneRegistry?.updateState(paneId, PaneState.Launching);
 
       if (needsTrust) {
         autoAcceptStartupPrompts(
-          this.tmuxBridge,
+          activeTmuxBridge,
           paneId,
           agentKey,
           () => {},
@@ -719,15 +737,17 @@ export class TelegramChannel implements NotificationChannel {
   }
 
   private getAvailableProjectAgents(cfg: Config): AgentName[] {
-    const validAgents = new Set<string>(Object.values(AgentName));
     const configuredAgents = cfg.agents.filter((agent): agent is AgentName =>
-      validAgents.has(agent)
+      TelegramChannel.isValidAgentKey(agent)
     );
-    const fallbackAgents = this.registry?.detectInstalled().map((provider) => provider.name) ?? [];
+    const fallbackAgents =
+      this.registry
+        ?.detectInstalled()
+        .map((provider) => provider.name)
+        .filter((agent): agent is AgentName => TelegramChannel.isValidAgentKey(agent)) ?? [];
     const filterAvailable = (agents: AgentName[]): AgentName[] =>
       agents.filter((agent) => {
-        const command = AGENT_START_COMMANDS[agent];
-        const binary = command?.trim().split(/\s+/)[0];
+        const binary = getAgentBinary(agent);
         return Boolean(binary && isCommandAvailable(binary));
       });
 
@@ -735,6 +755,10 @@ export class TelegramChannel implements NotificationChannel {
     if (availableConfigured.length > 0) return availableConfigured;
 
     return filterAvailable(fallbackAgents);
+  }
+
+  private static isValidAgentKey(agent: string): agent is AgentName {
+    return Object.values(AgentName).includes(agent as AgentName);
   }
 
   private async handleSessionCallback(query: TelegramBot.CallbackQuery): Promise<void> {

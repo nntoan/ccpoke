@@ -287,10 +287,12 @@ export const en: TranslationKeys = {
     empty: "No projects registered. Run 'ccpoke project' to add one.",
     chooseAgent: "Choose agent for {project}:",
     started: "✅ Agent started in {project}",
+    startedNoTmux:
+      "✅ Started {agent} in {project} without tmux. Notifications work, but /sessions and chat controls require tmux.",
     startFailed: "Failed to start panel for {project}",
     noAgentCli:
       "No configured agent CLI found in PATH. Run 'ccpoke setup' to select installed agents.",
-    noTmux: "tmux not available — cannot create new panels",
+    noTmux: "tmux not available — /sessions and chat controls are disabled",
     stale: "Project list changed. Use /projects again.",
   },
   prompt: {

@@ -287,10 +287,12 @@ export const vi: TranslationKeys = {
     empty: "Chưa đăng ký project nào. Chạy 'ccpoke project' để thêm.",
     chooseAgent: "Chọn agent cho {project}:",
     started: "✅ Đã khởi động agent trong {project}",
+    startedNoTmux:
+      "✅ Đã khởi động {agent} trong {project} mà không cần tmux. Notification vẫn hoạt động, nhưng /sessions và chat control cần tmux.",
     startFailed: "Không thể khởi động panel cho {project}",
     noAgentCli:
       "Không tìm thấy CLI agent đã cấu hình trong PATH. Hãy chạy 'ccpoke setup' để chọn lại agent đã cài.",
-    noTmux: "tmux không khả dụng — không thể tạo panel mới",
+    noTmux: "tmux không khả dụng — /sessions và chat control sẽ bị tắt",
     stale: "Danh sách project đã thay đổi. Hãy dùng /projects lại.",
   },
   prompt: {

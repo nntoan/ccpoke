@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 
 import { AgentName } from "../agent/types.js";
 import { getTmuxBinary, type TmuxBridge } from "../tmux/tmux-bridge.js";
@@ -16,12 +16,12 @@ export const AGENT_START_COMMANDS: Record<string, string> = {
 };
 
 function validateCliAvailable(agentKey: string): void {
-  const startCommand = AGENT_START_COMMANDS[agentKey];
-  if (!startCommand) {
+  const parsed = parseAgentCommand(agentKey);
+  if (!parsed) {
     throw new Error(`Unknown agent: ${agentKey}`);
   }
 
-  const binary = startCommand.split(" ")[0]!;
+  const { binary } = parsed;
   if (!isCommandAvailable(binary)) {
     throw new Error(`${binary} not found in PATH`);
   }
@@ -43,6 +43,24 @@ export function launchAgent(
     agentKey === AgentName.Cursor ||
     agentKey === AgentName.GeminiCli;
   return { paneId, panePid, needsTrust };
+}
+
+export function launchAgentWithoutTmux(projectPath: string, agentKey: string): { pid: number } {
+  validateCliAvailable(agentKey);
+  const parsed = parseAgentCommand(agentKey);
+  if (!parsed) throw new Error(`Unknown agent: ${agentKey}`);
+
+  const child = spawn(parsed.binary, parsed.args, {
+    cwd: projectPath,
+    detached: true,
+    stdio: "ignore",
+    windowsHide: true,
+  });
+  child.unref();
+  if (typeof child.pid !== "number" || child.pid <= 0) {
+    throw new Error(`Failed to launch ${agentKey} without tmux`);
+  }
+  return { pid: child.pid };
 }
 
 export function autoAcceptStartupPrompts(
@@ -165,4 +183,20 @@ function getTmuxSessionName(): string {
   } catch {
     return "0";
   }
+}
+
+export function getAgentBinary(agentKey: string): string | null {
+  const parsed = parseAgentCommand(agentKey);
+  return parsed?.binary ?? null;
+}
+
+function parseAgentCommand(agentKey: string): { binary: string; args: string[] } | null {
+  const startCommand = AGENT_START_COMMANDS[agentKey];
+  if (!startCommand) return null;
+
+  const parts = startCommand.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return null;
+  const binary = parts[0];
+  if (!binary) return null;
+  return { binary, args: parts.slice(1) };
 }
