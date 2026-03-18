@@ -55,7 +55,7 @@
     "prepublishOnly": "npm run build",
     "start": "node dist/index.js",
     "dev": "cross-env LOG_LEVEL=debug tsx src/index.ts",
-    "build:web": "cd web && npx astro build",
+    "build:web": "cd web && npm ci && npm run build",
     "deploy:web": "npm run build:web && gh-pages -d web/dist --dotfiles",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",

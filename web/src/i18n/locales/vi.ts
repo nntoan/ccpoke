@@ -34,7 +34,7 @@ export const vi: LocaleDict = {
   setupStep1Title: "Tạo bot token",
   setupStep1Desc: '<strong>Telegram:</strong> mở <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> → <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> → copy token.<br/><br/><strong>Discord:</strong> <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Developer Portal</a> → New Application → Bot → copy token.<br/><br/><strong>Slack:</strong> <a href="https://api.slack.com/apps" target="_blank" rel="noopener">Slack API</a> → Create New App → <strong>From scratch</strong> → đặt tên app & chọn workspace → OAuth & Permissions → thêm scope <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">chat:write</code> → cuộn lên mục OAuth Tokens → tạo và copy <strong>Bot User OAuth Token</strong>.',
   setupStep2Title: "Chạy một lệnh duy nhất",
-  setupStep2Desc: 'Wizard tự lo mọi thứ — hooks, kết nối bot, chọn agent. Dùng hàng ngày thì cài global: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g ccpoke</code>.',
+  setupStep2Desc: 'Wizard tự lo mọi thứ — hooks, kết nối bot, chọn agent. Dùng hàng ngày thì cài global: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g @nntoan/ccpoke</code>.',
   setupStep3Title: "Xong!",
   setupStep3Desc: 'Làm theo wizard để kết nối bot. Setup tự động — không cần cấu hình thủ công.',
 
@@ -154,7 +154,7 @@ export const vi: LocaleDict = {
   docsFaq4Q: "Dùng được trên Windows không?",
   docsFaq4A: "Thông báo đẩy (Phase 1) hoạt động trên Windows. Chat 2 chiều (Phase 2+) cần macOS hoặc Linux do phụ thuộc tmux.",
   docsFaq5Q: "Cập nhật thế nào?",
-  docsFaq5A: "Chạy <code>ccpoke update</code> hoặc <code>npm i -g ccpoke@latest</code> để lấy phiên bản mới nhất.",
+  docsFaq5A: "Chạy <code>ccpoke update</code> hoặc <code>npm i -g @nntoan/ccpoke@latest</code> để lấy phiên bản mới nhất.",
   docsFaq6Q: "Bảo mật thế nào?",
   docsFaq6A: "ccpoke chạy cục bộ trên máy bạn. Giao tiếp qua bot riêng (Telegram, Discord, hoặc Slack). Không có server bên thứ ba — code và prompt không rời máy bạn.",
   docsFaq7Q: "Dùng trên máy chủ remote thế nào?",
@@ -189,8 +189,8 @@ export const vi: LocaleDict = {
   docsStep1Title: "Tạo Bot Token",
   docsStep1Desc: 'Mở <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> trên Telegram → <code>/newbot</code> → lưu token.',
   docsStep2Title: "Chạy cài đặt",
-  docsStep2Desc: '<code>npx -y ccpoke</code> chạy ccpoke mà không cần cài — tiện để thử. Để dùng thường xuyên, cài global với <code>npm i -g ccpoke</code> (khuyến khích).',
-  docsStep2Term: "# Chạy thử (không cần cài):\n$ npx -y ccpoke\n\n# Khuyến khích (cài global):\n$ npm i -g ccpoke\n$ ccpoke",
+  docsStep2Desc: '<code>npx -y @nntoan/ccpoke</code> chạy ccpoke mà không cần cài — tiện để thử. Để dùng thường xuyên, cài global với <code>npm i -g @nntoan/ccpoke</code> (khuyến khích).',
+  docsStep2Term: "# Chạy thử (không cần cài):\n$ npx -y @nntoan/ccpoke\n\n# Khuyến khích (cài global):\n$ npm i -g @nntoan/ccpoke\n$ ccpoke",
   docsStep3Title: "Kết nối điện thoại",
   docsStep3Desc: "Quét QR code hoặc click link hiện trong terminal. Setup tự động — không cần nhập User ID thủ công.",
 

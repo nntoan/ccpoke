@@ -34,7 +34,7 @@ export const zh: LocaleDict = {
   setupStep1Title: "创建 Bot Token",
   setupStep1Desc: '<strong>Telegram:</strong> 打开 <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> → <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> → 复制 Token。<br/><br/><strong>Discord:</strong> <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Developer Portal</a> → New Application → Bot → 复制 Token。<br/><br/><strong>Slack:</strong> <a href="https://api.slack.com/apps" target="_blank" rel="noopener">Slack API</a> → Create New App → <strong>From scratch</strong> → 命名应用并选择工作区 → OAuth & Permissions → 添加 <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">chat:write</code> 权限 → 滚动到 OAuth Tokens → 生成并复制 <strong>Bot User OAuth Token</strong>。',
   setupStep2Title: "运行一个命令",
-  setupStep2Desc: '安装向导自动处理一切 — hooks、Bot 连接、代理选择。日常使用建议全局安装：<code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g ccpoke</code>。',
+  setupStep2Desc: '安装向导自动处理一切 — hooks、Bot 连接、代理选择。日常使用建议全局安装：<code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g @nntoan/ccpoke</code>。',
   setupStep3Title: "完成！",
   setupStep3Desc: '按向导提示连接 Bot。自动完成设置 — 无需手动配置。',
 
@@ -154,7 +154,7 @@ export const zh: LocaleDict = {
   docsFaq4Q: "能在 Windows 上使用吗？",
   docsFaq4A: "推送通知（Phase 1）支持 Windows。双向聊天（Phase 2+）由于 tmux 依赖需要 macOS 或 Linux。",
   docsFaq5Q: "如何更新？",
-  docsFaq5A: "运行 <code>ccpoke update</code> 或 <code>npm i -g ccpoke@latest</code> 获取最新版本。",
+  docsFaq5A: "运行 <code>ccpoke update</code> 或 <code>npm i -g @nntoan/ccpoke@latest</code> 获取最新版本。",
   docsFaq6Q: "安全性如何？",
   docsFaq6A: "ccpoke 在你的机器上本地运行。通过你自己的 Bot（Telegram、Discord 或 Slack）通信。没有第三方服务器 — 你的代码和提示不会离开你的机器。",
   docsFaq7Q: "如何在远程服务器上使用？",
@@ -189,8 +189,8 @@ export const zh: LocaleDict = {
   docsStep1Title: "创建 Bot Token",
   docsStep1Desc: '在 Telegram 上打开 <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> → <code>/newbot</code> → 保存 Token。',
   docsStep2Title: "运行安装",
-  docsStep2Desc: '<code>npx -y ccpoke</code> 无需安装即可运行 — 适合快速试用。日常使用建议全局安装 <code>npm i -g ccpoke</code>（推荐）。',
-  docsStep2Term: "# 快速试用（无需安装）：\n$ npx -y ccpoke\n\n# 推荐（全局安装）：\n$ npm i -g ccpoke\n$ ccpoke",
+  docsStep2Desc: '<code>npx -y @nntoan/ccpoke</code> 无需安装即可运行 — 适合快速试用。日常使用建议全局安装 <code>npm i -g @nntoan/ccpoke</code>（推荐）。',
+  docsStep2Term: "# 快速试用（无需安装）：\n$ npx -y @nntoan/ccpoke\n\n# 推荐（全局安装）：\n$ npm i -g @nntoan/ccpoke\n$ ccpoke",
   docsStep3Title: "连接手机",
   docsStep3Desc: "扫描终端中显示的二维码或点击链接。自动完成设置 — 无需手动输入用户 ID。",
 
