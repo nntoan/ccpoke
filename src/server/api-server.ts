@@ -11,8 +11,6 @@ import { eventCollector } from "../utils/event-collector.js";
 import { logger } from "../utils/log.js";
 import { responseStore } from "../utils/response-store.js";
 
-const ALLOWED_CORS_ORIGIN = new URL(MINI_APP_BASE_URL).origin;
-
 export class ApiServer {
   private app: Express;
   private server: Server | null = null;
@@ -84,8 +82,13 @@ export class ApiServer {
       }
     );
     app.options(ApiRoute.ResponseData, (_req, res) => {
+      const allowedOrigin = this.getAllowedCorsOrigin(_req.headers.origin);
+      if (!allowedOrigin) {
+        res.status(403).end();
+        return;
+      }
       res
-        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Origin", allowedOrigin)
         .header("Access-Control-Allow-Headers", "ngrok-skip-browser-warning")
         .header("Access-Control-Allow-Methods", "GET, OPTIONS")
         .status(204)
@@ -95,16 +98,10 @@ export class ApiServer {
       logger.debug(
         `[API] GET ${ApiRoute.ResponseData} id=${req.params.id} origin=${req.headers.origin ?? "none"}`
       );
-      const requestOrigin = req.headers.origin ?? "";
-      const tunnelUrl = this.tunnelManager?.getPublicUrl();
-      const tunnelOrigin = tunnelUrl ? new URL(tunnelUrl).origin : null;
-      const allowedOrigin =
-        requestOrigin === ALLOWED_CORS_ORIGIN
-          ? ALLOWED_CORS_ORIGIN
-          : tunnelOrigin && requestOrigin === tunnelOrigin
-            ? tunnelOrigin
-            : ALLOWED_CORS_ORIGIN;
-      res.header("Access-Control-Allow-Origin", allowedOrigin);
+      const allowedOrigin = this.getAllowedCorsOrigin(req.headers.origin);
+      if (allowedOrigin) {
+        res.header("Access-Control-Allow-Origin", allowedOrigin);
+      }
       const data = responseStore.get(req.params.id);
       if (!data) {
         res.status(404).json({ error: "not_found" });
@@ -229,5 +226,24 @@ export class ApiServer {
     });
 
     return app;
+  }
+
+  private getAllowedCorsOrigin(requestOrigin: string | undefined): string | null {
+    if (!requestOrigin) return null;
+
+    const allowedOrigins = new Set<string>();
+    if (MINI_APP_BASE_URL) {
+      allowedOrigins.add(new URL(MINI_APP_BASE_URL).origin);
+    }
+    const tunnelUrl = this.tunnelManager?.getPublicUrl();
+    if (tunnelUrl) {
+      try {
+        allowedOrigins.add(new URL(tunnelUrl).origin);
+      } catch {
+        logger.debug(`[API] invalid tunnel url for CORS: ${tunnelUrl}`);
+      }
+    }
+
+    return allowedOrigins.has(requestOrigin) ? requestOrigin : null;
   }
 }

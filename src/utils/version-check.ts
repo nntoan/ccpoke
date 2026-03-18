@@ -3,11 +3,11 @@ import { spawn } from "node:child_process";
 import * as p from "@clack/prompts";
 
 import { t } from "../i18n/index.js";
-import { InstallMethod, PackageManager } from "./constants.js";
+import { InstallMethod, NPM_PACKAGE_NAME, PackageManager } from "./constants.js";
 import { detectGlobalPackageManager, detectInstallMethod } from "./install-detection.js";
 import { getPackageVersion } from "./paths.js";
 
-const NPM_REGISTRY_URL = "https://registry.npmjs.org/ccpoke/latest";
+const NPM_REGISTRY_URL = `https://registry.npmjs.org/${encodeURIComponent(NPM_PACKAGE_NAME)}/latest`;
 const VERSION_CHECK_TIMEOUT_MS = 5_000;
 
 export interface UpdateInfo {
@@ -32,7 +32,7 @@ function isNewerVersion(current: string, latest: string): boolean {
 function getUpdateCommand(method: InstallMethod): string {
   switch (method) {
     case InstallMethod.Npx:
-      return "npx -y ccpoke@latest";
+      return `npx -y ${NPM_PACKAGE_NAME}@latest`;
     case InstallMethod.GitClone:
       return "git pull && npm run build";
     case InstallMethod.Global:
@@ -79,7 +79,7 @@ async function runUpdateInline(): Promise<
   { ok: true } | { ok: false; cmd: string; error: string }
 > {
   const pm = detectGlobalPackageManager();
-  const pkg = "ccpoke";
+  const pkg = NPM_PACKAGE_NAME;
   const cmd =
     pm === PackageManager.Yarn ? `yarn global add ${pkg}` : `${pm} install -g ${pkg}@latest`;
 

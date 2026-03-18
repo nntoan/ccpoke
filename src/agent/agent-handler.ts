@@ -196,7 +196,7 @@ export class AgentHandler {
 
   private buildResponseUrl(data: NotificationData): string | undefined {
     const apiBase = this.tunnelManager.getPublicUrl();
-    if (!apiBase) return undefined;
+    if (!apiBase || !MINI_APP_BASE_URL) return undefined;
 
     const id = responseStore.save(data);
     const params = new URLSearchParams({
