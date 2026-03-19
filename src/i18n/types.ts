@@ -33,6 +33,10 @@ export interface TranslationKeys {
     alreadyRunning: string;
     twowayEnabled: string;
     twowayDisabled: string;
+    commandsRetrying: string;
+    commandsRegisteredAfterRetry: string;
+    menuButtonRetrying: string;
+    menuButtonRegisteredAfterRetry: string;
   };
   setup: {
     intro: string;
@@ -235,6 +239,9 @@ export interface TranslationKeys {
     hookRepaired: string;
     hookReceived: string;
     noSessions: string;
+    sessionExists: string;
+    orphanedPanesCleaned: string;
+    orphanedPaneFound: string;
   };
   chat: {
     placeholder: string;
@@ -271,6 +278,8 @@ export interface TranslationKeys {
     startFailed: string;
     noTmux: string;
     stale: string;
+    agentNotAvailable: string;
+    noAgentsAvailable: string;
   };
   prompt: {
     elicitationTitle: string;

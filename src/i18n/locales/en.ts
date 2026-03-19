@@ -37,6 +37,10 @@ export const en: TranslationKeys = {
       "another ccpoke is already running on port {port}\n\n  To stop it:\n    {killCommand}\n",
     twowayEnabled: "📱 2-way chat: enabled",
     twowayDisabled: "📱 2-way chat: disabled (no tmux)",
+    commandsRetrying: "retrying command registration (attempt {attempt}/{max})...",
+    commandsRegisteredAfterRetry: "commands registered after {attempt} retries",
+    menuButtonRetrying: "retrying menu button registration (attempt {attempt}/{max})...",
+    menuButtonRegisteredAfterRetry: "menu button registered after {attempt} retries",
   },
 
   setup: {
@@ -253,6 +257,9 @@ export const en: TranslationKeys = {
     hookRepaired: "{agent} hooks repaired (missing: {missing})",
     hookReceived: "Hook {event}: {sessionId} → {target} ({project})",
     noSessions: "No active Claude Code sessions in tmux",
+    sessionExists: "ccpoke tmux session already exists: {session}",
+    orphanedPanesCleaned: "cleaned {count} orphaned pane(s) from previous session",
+    orphanedPaneFound: "found orphaned pane: {paneId}",
   },
   chat: {
     placeholder: "Message to Claude...",
@@ -290,6 +297,8 @@ export const en: TranslationKeys = {
     startFailed: "Failed to start panel for {project}",
     noTmux: "tmux not available — cannot create new panels",
     stale: "Project list changed. Use /projects again.",
+    agentNotAvailable: "{agent} is not available in PATH. Please install it first.",
+    noAgentsAvailable: "No agents available. Install at least one supported agent.",
   },
   prompt: {
     elicitationTitle: "Claude needs input",

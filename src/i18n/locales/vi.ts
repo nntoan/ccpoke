@@ -37,6 +37,10 @@ export const vi: TranslationKeys = {
       "một ccpoke khác đang chạy trên port {port}\n\n  Để dừng nó:\n    {killCommand}\n",
     twowayEnabled: "📱 Chat 2 chiều: đã bật",
     twowayDisabled: "📱 Chat 2 chiều: tắt (không có tmux)",
+    commandsRetrying: "đang thử đăng ký lệnh (lần {attempt}/{max})...",
+    commandsRegisteredAfterRetry: "đã đăng ký lệnh sau {attempt} lần thử",
+    menuButtonRetrying: "đang thử đăng ký nút menu (lần {attempt}/{max})...",
+    menuButtonRegisteredAfterRetry: "đã đăng ký nút menu sau {attempt} lần thử",
   },
 
   setup: {
@@ -253,6 +257,9 @@ export const vi: TranslationKeys = {
     hookRepaired: "{agent} hooks đã sửa (thiếu: {missing})",
     hookReceived: "Hook {event}: {sessionId} → {target} ({project})",
     noSessions: "Không có Claude Code session nào trong tmux",
+    sessionExists: "phiên tmux ccpoke đã tồn tại: {session}",
+    orphanedPanesCleaned: "đã dọn {count} pane(s) bị bỏ lại từ phiên trước",
+    orphanedPaneFound: "tìm thấy pane bị bỏ lại: {paneId}",
   },
   chat: {
     placeholder: "Nhắn cho Claude...",
@@ -290,6 +297,8 @@ export const vi: TranslationKeys = {
     startFailed: "Không thể khởi động panel cho {project}",
     noTmux: "tmux không khả dụng — không thể tạo panel mới",
     stale: "Danh sách project đã thay đổi. Hãy dùng /projects lại.",
+    agentNotAvailable: "{agent} không có trong PATH. Vui lòng cài đặt trước.",
+    noAgentsAvailable: "Không có agent nào khả dụng. Hãy cài đặt ít nhất một agent được hỗ trợ.",
   },
   prompt: {
     elicitationTitle: "Claude cần input",

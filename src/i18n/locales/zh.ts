@@ -35,6 +35,10 @@ export const zh: TranslationKeys = {
     alreadyRunning: "另一个 ccpoke 已在端口 {port} 上运行\n\n  停止方法:\n    {killCommand}\n",
     twowayEnabled: "📱 双向聊天: 已启用",
     twowayDisabled: "📱 双向聊天: 已禁用 (无 tmux)",
+    commandsRetrying: "正在重试注册命令（第 {attempt}/{max} 次）...",
+    commandsRegisteredAfterRetry: "经过 {attempt} 次重试后成功注册命令",
+    menuButtonRetrying: "正在重试注册菜单按钮（第 {attempt}/{max} 次）...",
+    menuButtonRegisteredAfterRetry: "经过 {attempt} 次重试后成功注册菜单按钮",
   },
 
   setup: {
@@ -250,6 +254,9 @@ export const zh: TranslationKeys = {
     hookRepaired: "{agent} 钩子已修复 (缺少: {missing})",
     hookReceived: "钩子 {event}: {sessionId} → {target} ({project})",
     noSessions: "tmux 中没有活动的 Claude Code 会话",
+    sessionExists: "ccpoke tmux 会话已存在：{session}",
+    orphanedPanesCleaned: "已清理来自上次会话的 {count} 个孤立面板",
+    orphanedPaneFound: "发现孤立面板：{paneId}",
   },
   chat: {
     placeholder: "给 Claude 发消息...",
@@ -286,6 +293,8 @@ export const zh: TranslationKeys = {
     startFailed: "无法为 {project} 启动面板",
     noTmux: "tmux 不可用 — 无法创建新面板",
     stale: "项目列表已更改。请重新使用 /projects。",
+    agentNotAvailable: "{agent} 不在 PATH 中，请先安装。",
+    noAgentsAvailable: "没有可用的 agent，请至少安装一个支持的 agent。",
   },
   prompt: {
     elicitationTitle: "Claude 需要输入",
