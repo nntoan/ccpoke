@@ -209,23 +209,55 @@ export class TelegramChannel implements NotificationChannel {
       { command: "projects", description: translations.bot.commands.projects },
     ];
 
-    try {
-      await this.bot.setMyCommands(commands);
-      logger.info(t("bot.commandsRegistered"));
-    } catch (err: unknown) {
-      logger.error({ err }, t("bot.commandsRegisterFailed"));
+    const REGISTER_RETRY_DELAYS = [2_000, 5_000, 10_000];
+    let lastErr: unknown;
+    for (let attempt = 0; attempt < REGISTER_RETRY_DELAYS.length; attempt++) {
+      try {
+        await this.bot.setMyCommands(commands);
+        if (attempt > 0) {
+          logger.info(t("bot.commandsRegisteredAfterRetry", { attempt }));
+        } else {
+          logger.info(t("bot.commandsRegistered"));
+        }
+        return;
+      } catch (err: unknown) {
+        lastErr = err;
+        if (attempt < REGISTER_RETRY_DELAYS.length - 1) {
+          logger.warn(
+            t("bot.commandsRetrying", { attempt: attempt + 1, max: REGISTER_RETRY_DELAYS.length })
+          );
+          await new Promise((resolve) => setTimeout(resolve, REGISTER_RETRY_DELAYS[attempt]));
+        }
+      }
     }
+    logger.error({ err: lastErr }, t("bot.commandsRegisterFailed"));
   }
 
   private async registerMenuButton(): Promise<void> {
-    try {
-      await this.bot.setChatMenuButton({
-        menu_button: JSON.stringify({ type: "commands" }),
-      } as Record<string, unknown>);
-      logger.info(t("bot.menuButtonRegistered"));
-    } catch (err: unknown) {
-      logger.error({ err }, t("bot.menuButtonFailed"));
+    const REGISTER_RETRY_DELAYS = [2_000, 5_000, 10_000];
+    let lastErr: unknown;
+    for (let attempt = 0; attempt < REGISTER_RETRY_DELAYS.length; attempt++) {
+      try {
+        await this.bot.setChatMenuButton({
+          menu_button: JSON.stringify({ type: "commands" }),
+        } as Record<string, unknown>);
+        if (attempt > 0) {
+          logger.info(t("bot.menuButtonRegisteredAfterRetry", { attempt }));
+        } else {
+          logger.info(t("bot.menuButtonRegistered"));
+        }
+        return;
+      } catch (err: unknown) {
+        lastErr = err;
+        if (attempt < REGISTER_RETRY_DELAYS.length - 1) {
+          logger.warn(
+            t("bot.menuButtonRetrying", { attempt: attempt + 1, max: REGISTER_RETRY_DELAYS.length })
+          );
+          await new Promise((resolve) => setTimeout(resolve, REGISTER_RETRY_DELAYS[attempt]));
+        }
+      }
     }
+    logger.error({ err: lastErr }, t("bot.menuButtonFailed"));
   }
 
   private registerHandlers(): void {
