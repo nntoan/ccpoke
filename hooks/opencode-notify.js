@@ -5,12 +5,13 @@ import { join } from "node:path";
 function loadCcpokeConfig() {
   try {
     return JSON.parse(readFileSync(join(homedir(), ".ccpoke", "config.json"), "utf-8"));
-  } catch {
+  } catch (err) {
+    console.warn("[ccpoke] config load failed, using defaults:", err?.message);
     return { hook_port: 9377, hook_secret: "" };
   }
 }
 
-export default async function ({ $, client, directory, worktree }) {
+export const CcpokeNotify = async ({ $, client, directory, worktree }) => {
   const cfg = loadCcpokeConfig();
   const ccpokeHost = process.env.CCPOKE_HOST || "localhost";
   const port = cfg.hook_port;
@@ -34,7 +35,7 @@ export default async function ({ $, client, directory, worktree }) {
         if (msg.info?.role !== "assistant") continue;
         model = msg.info.modelID ? msg.info.providerID + "/" + msg.info.modelID : "";
         const texts = (msg.parts ?? []).filter((p) => p.type === "text").map((p) => p.text ?? "");
-        summary = texts.join("\\n").slice(0, 500);
+        summary = texts.join("\n").slice(0, 500);
         break;
       }
       return { summary, model };
@@ -57,7 +58,9 @@ export default async function ({ $, client, directory, worktree }) {
           await $`echo ${payload} | curl -s -X POST "http://${ccpokeHost}:${port}/hook/ask-user-question${agentParam}" -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${secret}" --data-binary @- --max-time 5`
             .nothrow()
             .quiet();
-        } catch {}
+        } catch (err) {
+          console.warn("[ccpoke] hook error:", err?.message || err);
+        }
         return;
       }
 
@@ -77,11 +80,20 @@ export default async function ({ $, client, directory, worktree }) {
           await $`echo ${payload} | curl -s -X POST "http://${ccpokeHost}:${port}/hook/permission-request${agentParam}" -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${secret}" --data-binary @- --max-time 5`
             .nothrow()
             .quiet();
-        } catch {}
+        } catch (err) {
+          console.warn("[ccpoke] hook error:", err?.message || err);
+        }
         return;
       }
 
-      if (event.type !== "session.idle" && event.type !== "session.error") return;
+      if (
+        event.type !== "session.idle" &&
+        event.type !== "session.error" &&
+        event.type !== "session.status"
+      )
+        return;
+      // For session.status, only proceed if it represents an idle state
+      if (event.type === "session.status" && event.properties?.status?.type !== "idle") return;
       const sessionID = event.properties?.sessionID || "";
       const cwd = worktree || directory;
       const ctx = await fetchSessionContext(sessionID);
@@ -97,7 +109,9 @@ export default async function ({ $, client, directory, worktree }) {
         await $`echo ${payload} | curl -s -X POST "http://${ccpokeHost}:${port}/hook/stop${agentParam}" -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${secret}" --data-binary @- --max-time 5`
           .nothrow()
           .quiet();
-      } catch {}
+      } catch (err) {
+        console.warn("[ccpoke] hook error:", err?.message || err);
+      }
     },
   };
-}
+};
