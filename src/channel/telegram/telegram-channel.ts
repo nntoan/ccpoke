@@ -19,7 +19,7 @@ import { checkPaneHealth } from "../../tmux/tmux-scanner.js";
 import { logger } from "../../utils/log.js";
 import { truncateMarkdown } from "../../utils/markdown.js";
 import { formatModelName } from "../../utils/stats-format.js";
-import { autoAcceptStartupPrompts, launchAgent } from "../agent-launcher.js";
+import { autoAcceptStartupPrompts, isAgentAvailable, launchAgent } from "../agent-launcher.js";
 import { buildSessionLabel } from "../session-label.js";
 import type { ChannelDeps, NotificationChannel, NotificationData } from "../types.js";
 import { AskQuestionHandler } from "./ask-question-handler.js";
@@ -662,12 +662,22 @@ export class TelegramChannel implements NotificationChannel {
     await this.bot.answerCallbackQuery(query.id);
 
     const agents = cfg.agents;
-    if (agents.length === 1) {
-      await this.startAgentForProject(query, project, agents[0]!);
+    const availableAgents = agents.filter((a) => isAgentAvailable(a));
+
+    if (availableAgents.length === 0) {
+      await this.bot.sendMessage(
+        query.message.chat.id,
+        padMaxWidth(t("projects.noAgentsAvailable"))
+      );
       return;
     }
 
-    const buttons: TelegramBot.InlineKeyboardButton[] = agents.map((agent) => ({
+    if (availableAgents.length === 1) {
+      await this.startAgentForProject(query, project, availableAgents[0]!);
+      return;
+    }
+
+    const buttons: TelegramBot.InlineKeyboardButton[] = availableAgents.map((agent) => ({
       text: AGENT_DISPLAY_NAMES[agent as AgentName] ?? agent,
       callback_data: `agent_start:${idx}:${agent}`,
     }));
@@ -730,10 +740,19 @@ export class TelegramChannel implements NotificationChannel {
       );
     } catch (err) {
       logger.error({ err }, `[Projects] failed to start panel for ${project.name}`);
-      await this.bot.sendMessage(
-        query.message.chat.id,
-        padMaxWidth(t("projects.startFailed", { project: project.name }))
-      );
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (errMsg.includes("not found in PATH")) {
+        const binary = errMsg.split(" ")[0] ?? agentKey;
+        await this.bot.sendMessage(
+          query.message.chat.id,
+          padMaxWidth(t("projects.agentNotAvailable", { agent: binary }))
+        );
+      } else {
+        await this.bot.sendMessage(
+          query.message.chat.id,
+          padMaxWidth(t("projects.startFailed", { project: project.name }))
+        );
+      }
     }
   }
 

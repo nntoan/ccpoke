@@ -27,6 +27,13 @@ function validateCliAvailable(agentKey: string): void {
   }
 }
 
+export function isAgentAvailable(agentKey: string): boolean {
+  const startCommand = AGENT_START_COMMANDS[agentKey];
+  if (!startCommand) return false;
+  const binary = startCommand.split(" ")[0]!;
+  return isCommandAvailable(binary);
+}
+
 export function launchAgent(
   tmuxBridge: TmuxBridge,
   projectPath: string,
