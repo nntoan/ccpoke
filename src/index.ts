@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execSync } from "node:child_process";
 import { basename } from "node:path";
 
 import { AgentHandler } from "./agent/agent-handler.js";
@@ -20,7 +21,7 @@ import { t } from "./i18n/index.js";
 import { ApiServer } from "./server/api-server.js";
 import { PaneRegistry } from "./tmux/pane-registry.js";
 import { PaneStateManager } from "./tmux/pane-state-manager.js";
-import { TmuxBridge } from "./tmux/tmux-bridge.js";
+import { getTmuxBinary, TmuxBridge } from "./tmux/tmux-bridge.js";
 import { TmuxPaneResolver } from "./tmux/tmux-pane-resolver.js";
 import { findAgentDescendant, queryPanePid } from "./tmux/tmux-scanner.js";
 import { TunnelManager } from "./tunnel/tunnel-manager.js";
@@ -102,8 +103,31 @@ async function startBot(): Promise<void> {
   let chatResolver: TmuxPaneResolver | undefined;
 
   if (tmuxBridge.isTmuxAvailable()) {
+    try {
+      const bin = getTmuxBinary();
+      const sessionList = execSync(
+        `${bin} list-sessions -F "#{session_name}" 2>/dev/null || true`,
+        { encoding: "utf-8", stdio: "pipe", timeout: 3000 }
+      ).trim();
+      if (sessionList) {
+        for (const sessionName of sessionList.split("\n").filter(Boolean)) {
+          logger.warn(t("tmux.sessionExists", { session: sessionName }));
+        }
+      }
+    } catch {
+      /* tmux not running — no sessions to warn about */
+    }
+
     paneRegistry.load();
     const bootResult = paneRegistry.refreshFromTmux(tmuxBridge);
+
+    if (bootResult.removed.length > 0) {
+      for (const p of bootResult.removed) {
+        logger.info(t("tmux.orphanedPaneFound", { paneId: p.paneId }));
+      }
+      logger.info(t("tmux.orphanedPanesCleaned", { count: bootResult.removed.length }));
+    }
+
     if (
       bootResult.reconciled > 0 ||
       bootResult.discovered.length > 0 ||
